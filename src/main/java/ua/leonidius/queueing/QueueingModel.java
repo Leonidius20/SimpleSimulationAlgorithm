@@ -1,44 +1,44 @@
 package ua.leonidius.queueing;
 
 import ua.leonidius.queueing.elements.Element;
-import ua.leonidius.queueing.elements.Process;
+import ua.leonidius.queueing.elements.QueueingSystem;
 
 import java.util.ArrayList;
 
-public class Model {
+public class QueueingModel {
 
-    private ArrayList<Element> list = new ArrayList<>();
-    double tnext, tcurr;
-    int event;
-    public Model(ArrayList<Element> elements) {
+    private final ArrayList<Element> list;
+
+    double nextEventTime = 0.0, currentTime = 0.0;
+
+    int event = 0;
+
+    public QueueingModel(ArrayList<Element> elements) {
         list = elements;
-        tnext = 0.0;
-        event = 0;
-        tcurr = tnext;
     }
 
     public void simulate(double time) {
-        while (tcurr < time) {
-            tnext = Double.MAX_VALUE;
+        while (currentTime < time) {
+            nextEventTime = Double.MAX_VALUE;
             for (Element e : list) {
-                if (e.getNextEventTime() < tnext) {
-                    tnext = e.getNextEventTime();
+                if (e.getNextEventTime() < nextEventTime) {
+                    nextEventTime = e.getNextEventTime();
                     event = e.getId();
                 }
             }
             System.out.println("\nIt's time for event in " +
                     list.get(event).getName() +
-                    ", time = " + tnext);
+                    ", time = " + nextEventTime);
             for (Element e : list) {
-                e.doStatistics(tnext - tcurr);
+                e.doStatistics(nextEventTime - currentTime);
             }
-            tcurr = tnext;
+            currentTime = nextEventTime;
             for (Element e : list) {
-                e.setCurrentTime(tcurr);
+                e.setCurrentTime(currentTime);
             }
             list.get(event).onServiceCompletion();
             for (Element e : list) {
-                if (e.getNextEventTime() == tcurr) {
+                if (e.getNextEventTime() == currentTime) {
                     e.onServiceCompletion();
                 }
             }
@@ -55,12 +55,11 @@ public class Model {
         System.out.println("\n-------------RESULTS-------------");
         for (Element e : list) {
             e.printResult();
-            if (e instanceof Process) {
-                Process p = (Process) e;
+            if (e instanceof QueueingSystem qSystem) {
                 System.out.println("mean length of queue = " +
-                        p.getMeanQueue() / tcurr
+                        qSystem.getMeanQueueLength() / currentTime
                         + "\nfailure probability = " +
-                        p.getFailure() / (double) p.getNumberOfCustomersServed());
+                        qSystem.getNumberOfDropouts() / (double) qSystem.getNumberOfCustomersServed());
             }
         }
     }

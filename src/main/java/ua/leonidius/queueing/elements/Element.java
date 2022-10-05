@@ -8,19 +8,12 @@ import ua.leonidius.queueing.utils.ProbabilityDistributions;
 public class Element {
 
     @Getter @Setter private String name;
-
     @Getter @Setter private double currentTime = 0.0;
-
     @Getter @Setter private double nextEventTime = 0.0;
-
     @Getter @Setter private double meanServiceTime;
-
     @Getter @Setter private double serviceTimeStdDeviation;
-
-    @Getter @Setter private ProbabilityDistribution distribution; // shit
-
+    @Getter @Setter private ProbabilityDistribution distribution;
     @Getter private int numberOfCustomersServed;
-
     @Getter @Setter private int state = 0;
 
     /**
@@ -29,7 +22,6 @@ public class Element {
     @Getter @Setter private Element nextElement = null;
 
     private static int nextId = 0;
-
     @Getter @Setter private int id;
 
     public Element() {
