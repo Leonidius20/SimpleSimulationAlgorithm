@@ -10,19 +10,23 @@ import java.util.ArrayList;
 public class Main {
 
     public static void main(String[] args) {
-        Create c = new Create(2.0);
-        QueueingSystem p = new QueueingSystem(1.0);
-        System.out.println("id0 = " + c.getId() + " id1=" +
-                p.getId());
-        c.setNextElement(p);
-        p.setQueueCapacity(5);
-        c.setName("CREATOR");
-        p.setName("PROCESSOR");
-        c.setDistribution(ProbabilityDistribution.EXPONENTIAL);
-        p.setDistribution(ProbabilityDistribution.EXPONENTIAL);
+        Create creationElement = new Create(2.0);
+        QueueingSystem queueingSystem = new QueueingSystem(1.0);
+
+        System.out.println("id0 = " + creationElement.getId() + " id1=" +
+                queueingSystem.getId());
+
+        creationElement.setNextElement(queueingSystem);
+        creationElement.setName("CREATOR");
+        creationElement.setDistribution(ProbabilityDistribution.EXPONENTIAL);
+
+        queueingSystem.setQueueCapacity(5);
+        queueingSystem.setName("PROCESSOR");
+        queueingSystem.setDistribution(ProbabilityDistribution.EXPONENTIAL);
+
         ArrayList<Element> list = new ArrayList<>();
-        list.add(c);
-        list.add(p);
+        list.add(creationElement);
+        list.add(queueingSystem);
         QueueingModel model = new QueueingModel(list);
         model.simulate(1000.0);
     }

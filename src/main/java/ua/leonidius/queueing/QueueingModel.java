@@ -4,62 +4,76 @@ import ua.leonidius.queueing.elements.Element;
 import ua.leonidius.queueing.elements.QueueingSystem;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class QueueingModel {
 
-    private final ArrayList<Element> list;
+    private final ArrayList<Element> listOfElements;
 
     double nextEventTime = 0.0, currentTime = 0.0;
 
-    int event = 0;
+    int nextEventId = 0;
 
     public QueueingModel(ArrayList<Element> elements) {
-        list = elements;
+        listOfElements = elements;
     }
 
-    public void simulate(double time) {
-        while (currentTime < time) {
-            nextEventTime = Double.MAX_VALUE;
-            for (Element e : list) {
-                if (e.getNextEventTime() < nextEventTime) {
-                    nextEventTime = e.getNextEventTime();
-                    event = e.getId();
-                }
-            }
+    public void simulate(double simulationTime) {
+        while (currentTime < simulationTime) {
+
+            var nextEventElement =
+                    listOfElements.stream()
+                            .min(Comparator.comparingDouble(Element::getNextEventTime))
+                            .get();
+            nextEventTime = nextEventElement.getNextEventTime();
+            nextEventId = nextEventElement.getId();
+
             System.out.println("\nIt's time for event in " +
-                    list.get(event).getName() +
-                    ", time = " + nextEventTime);
-            for (Element e : list) {
-                e.doStatistics(nextEventTime - currentTime);
-            }
+                    nextEventElement.getName() +
+                    ", id="+ nextEventId + ", time=" + nextEventTime);
+
+
+            double delta = nextEventTime - currentTime;
+
             currentTime = nextEventTime;
-            for (Element e : list) {
+
+            listOfElements.forEach(e -> {
+                e.doStatistics(delta);
                 e.setCurrentTime(currentTime);
-            }
-            list.get(event).onServiceCompletion();
-            for (Element e : list) {
+            });
+
+            nextEventElement.onServiceCompletion(); // it depends on updated currentTime
+
+            for (Element e : listOfElements) {
                 if (e.getNextEventTime() == currentTime) {
                     e.onServiceCompletion();
                 }
             }
-            printInfo();
+
+            printIterationInfo();
         }
-        printResult();
+
+        printFinalResult();
     }
-    public void printInfo() {
-        for (Element e : list) {
-            e.printInfo();
-        }
+
+    public void printIterationInfo() {
+        listOfElements.forEach(Element::printInfo);
     }
-    public void printResult() {
+
+    public void printFinalResult() {
         System.out.println("\n-------------RESULTS-------------");
-        for (Element e : list) {
+
+        for (Element e : listOfElements) {
             e.printResult();
             if (e instanceof QueueingSystem qSystem) {
+                double meanQueueLength = qSystem.getMeanQueueLengthAccumulator() / currentTime;
+                double dropoutProbability = qSystem.getNumberOfDropouts()
+                        / (double)qSystem.getNumberOfCustomersServed();
+
                 System.out.println("mean length of queue = " +
-                        qSystem.getMeanQueueLength() / currentTime
+                        meanQueueLength
                         + "\nfailure probability = " +
-                        qSystem.getNumberOfDropouts() / (double) qSystem.getNumberOfCustomersServed());
+                        dropoutProbability);
             }
         }
     }
