@@ -72,7 +72,8 @@ public class QueueingModel {
                         / (double)qSystem.getNumberOfCustomersServed();
 
                 System.out.println(
-                        "mean length of queue = " + meanQueueLength
+                        "Q SYSTEM " + qSystem.getName()
+                                + "\nmean length of queue = " + meanQueueLength
                                 + "\nmean utilization = " + meanUtilization
                                 + "\nfailure probability = " + dropoutProbability);
             }

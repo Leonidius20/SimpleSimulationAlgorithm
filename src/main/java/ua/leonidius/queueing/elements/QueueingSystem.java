@@ -2,6 +2,7 @@ package ua.leonidius.queueing.elements;
 
 import lombok.Getter;
 import lombok.Setter;
+import ua.leonidius.queueing.utils.ProbabilityDistribution;
 
 /**
  * A Queueing system element (Система масового обслуговування)
@@ -20,6 +21,13 @@ public class QueueingSystem extends Element {
         currentQueueLength = 0;
         queueCapacity = Integer.MAX_VALUE;
         meanQueueLengthAccumulator = 0.0;
+    }
+
+    public QueueingSystem(double delay, int queueCapacity,
+                          ProbabilityDistribution distribution, String name) {
+        super(name, delay);
+        setQueueCapacity(queueCapacity);
+        setDistribution(distribution);
     }
 
     @Override
@@ -45,6 +53,10 @@ public class QueueingSystem extends Element {
             setCurrentQueueLength(getCurrentQueueLength() - 1);
             super.setState(1);
             super.setNextEventTime(super.getCurrentTime() + super.getServiceTime());
+        }
+
+        if (getNextElement() != null) {
+            getNextElement().onCustomerArrival();
         }
     }
 

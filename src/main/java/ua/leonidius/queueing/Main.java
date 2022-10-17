@@ -11,22 +11,24 @@ public class Main {
 
     public static void main(String[] args) {
         Create creationElement = new Create(1.2);
-        QueueingSystem queueingSystem = new QueueingSystem(1.0);
 
-        System.out.println("id0 = " + creationElement.getId() + " id1=" +
-                queueingSystem.getId());
+        QueueingSystem queueingSystem1 = new QueueingSystem(
+                1.0, 5, ProbabilityDistribution.EXPONENTIAL, "PROCESSOR 1");
+        QueueingSystem queueingSystem2 = new QueueingSystem(
+                1.0, 5, ProbabilityDistribution.EXPONENTIAL, "PROCESSOR 2");
+        QueueingSystem queueingSystem3 = new QueueingSystem(
+                1.0, 5, ProbabilityDistribution.EXPONENTIAL, "PROCESSOR 3");
 
-        creationElement.setNextElement(queueingSystem);
-        creationElement.setName("CREATOR");
-        creationElement.setDistribution(ProbabilityDistribution.EXPONENTIAL);
-
-        queueingSystem.setQueueCapacity(5);
-        queueingSystem.setName("PROCESSOR");
-        queueingSystem.setDistribution(ProbabilityDistribution.EXPONENTIAL);
+        creationElement.setNextElement(queueingSystem1);
+        queueingSystem1.setNextElement(queueingSystem2);
+        queueingSystem2.setNextElement(queueingSystem3);
 
         ArrayList<Element> list = new ArrayList<>();
         list.add(creationElement);
-        list.add(queueingSystem);
+        list.add(queueingSystem1);
+        list.add(queueingSystem2);
+        list.add(queueingSystem3);
+
         QueueingModel model = new QueueingModel(list);
         model.simulate(1000.0);
     }
