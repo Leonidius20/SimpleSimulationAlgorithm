@@ -67,13 +67,14 @@ public class QueueingModel {
             e.printResult();
             if (e instanceof QueueingSystem qSystem) {
                 double meanQueueLength = qSystem.getMeanQueueLengthAccumulator() / currentTime;
+                double meanUtilization = qSystem.getMeanUtilizationAccumulator() / currentTime;
                 double dropoutProbability = qSystem.getNumberOfDropouts()
                         / (double)qSystem.getNumberOfCustomersServed();
 
-                System.out.println("mean length of queue = " +
-                        meanQueueLength
-                        + "\nfailure probability = " +
-                        dropoutProbability);
+                System.out.println(
+                        "mean length of queue = " + meanQueueLength
+                                + "\nmean utilization = " + meanUtilization
+                                + "\nfailure probability = " + dropoutProbability);
             }
         }
     }

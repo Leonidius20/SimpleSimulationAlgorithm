@@ -11,7 +11,9 @@ public class QueueingSystem extends Element {
     @Getter @Setter private int currentQueueLength;
     @Getter @Setter private int queueCapacity;
     @Getter private int numberOfDropouts;
+
     @Getter private double meanQueueLengthAccumulator;
+    @Getter private double meanUtilizationAccumulator;
 
     public QueueingSystem(double delay) {
         super(delay);
@@ -55,6 +57,7 @@ public class QueueingSystem extends Element {
     @Override
     public void doStatistics(double delta) {
         meanQueueLengthAccumulator = getMeanQueueLengthAccumulator() + currentQueueLength * delta;
+        meanUtilizationAccumulator = getMeanUtilizationAccumulator() + getState() * delta;
     }
 
 }

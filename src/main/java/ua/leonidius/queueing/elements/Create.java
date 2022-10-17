@@ -2,8 +2,8 @@ package ua.leonidius.queueing.elements;
 
 public class Create extends Element {
 
-    public Create(double serviceTime) {
-        super(serviceTime);
+    public Create(double creationInterval) {
+        super(creationInterval);
     }
 
     @Override

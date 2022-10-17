@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class Main {
 
     public static void main(String[] args) {
-        Create creationElement = new Create(2.0);
+        Create creationElement = new Create(1.2);
         QueueingSystem queueingSystem = new QueueingSystem(1.0);
 
         System.out.println("id0 = " + creationElement.getId() + " id1=" +
