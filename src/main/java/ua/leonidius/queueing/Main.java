@@ -1,5 +1,7 @@
 package ua.leonidius.queueing;
 
+import ua.leonidius.queueing.beans.input_params.InputParameters;
+import ua.leonidius.queueing.beans.input_params.QSystemParameters;
 import ua.leonidius.queueing.elements.Create;
 import ua.leonidius.queueing.elements.Element;
 import ua.leonidius.queueing.elements.QueueingSystem;
@@ -11,6 +13,10 @@ public class Main {
 
     public static void main(String[] args) {
         Create creationElement = new Create(1.2);
+
+        var inputParams = new InputParameters(3, new QSystemParameters[]{
+
+        });
 
         QueueingSystem queueingSystem1 = new QueueingSystem(
                 1.0, 5, ProbabilityDistribution.EXPONENTIAL, "PROCESSOR 1");

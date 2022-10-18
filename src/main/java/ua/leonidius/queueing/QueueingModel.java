@@ -63,6 +63,8 @@ public class QueueingModel {
     public void printFinalResult() {
         System.out.println("\n-------------RESULTS-------------");
 
+        double totalDropoutProbability = 1;
+
         for (Element e : listOfElements) {
             e.printResult();
             if (e instanceof QueueingSystem qSystem) {
@@ -70,6 +72,7 @@ public class QueueingModel {
                 double meanUtilization = qSystem.getMeanUtilizationAccumulator() / currentTime;
                 double dropoutProbability = qSystem.getNumberOfDropouts()
                         / (double)qSystem.getNumberOfCustomersServed();
+                totalDropoutProbability *= dropoutProbability;
 
                 System.out.println(
                         "Q SYSTEM " + qSystem.getName()
@@ -78,6 +81,8 @@ public class QueueingModel {
                                 + "\nfailure probability = " + dropoutProbability);
             }
         }
+
+        System.out.println("Total Dropout Probability: " + totalDropoutProbability);
     }
 
 }

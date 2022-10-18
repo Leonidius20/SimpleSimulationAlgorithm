@@ -70,6 +70,7 @@ public class QueueingSystem extends Element {
     public void doStatistics(double delta) {
         meanQueueLengthAccumulator = getMeanQueueLengthAccumulator() + currentQueueLength * delta;
         meanUtilizationAccumulator = getMeanUtilizationAccumulator() + getState() * delta;
+        // TODO: replace getState() when state = blocked is introduced
     }
 
 }
