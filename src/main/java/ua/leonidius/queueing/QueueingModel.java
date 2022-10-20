@@ -30,9 +30,9 @@ public class QueueingModel {
             nextEventTime = nextEventElement.getNextEventTime();
             nextEventId = nextEventElement.getId();
 
-            //System.out.println("\nIt's time for event in " +
-            //        nextEventElement.getName() +
-             //       ", id="+ nextEventId + ", time=" + nextEventTime);
+            System.out.println("\nIt's time for event in " +
+                    nextEventElement.getName() +
+                    ", id="+ nextEventId + ", time=" + nextEventTime);
 
 
             double delta = nextEventTime - currentTime;
@@ -63,7 +63,7 @@ public class QueueingModel {
     }
 
     public OutputParameters getFinalResult() {
-        // System.out.println("\n-------------RESULTS-------------");
+        System.out.println("\n-------------RESULTS-------------");
 
 
         var createElement = listOfElements.get(0);
@@ -90,10 +90,9 @@ public class QueueingModel {
             totalDropoutProbability *= dropoutProbability;
         }
 
+
         return new OutputParameters(totalNumCustomers, totalDropoutProbability, new QSystemPerformanceMetrics[]{
-                new QSystemPerformanceMetrics(dropoutNumbers[0], meanQLengths[0], meanUtilizations[0]),
-                new QSystemPerformanceMetrics(dropoutNumbers[1], meanQLengths[1], meanUtilizations[1]),
-                new QSystemPerformanceMetrics(dropoutNumbers[2], meanQLengths[2], meanUtilizations[2])
+                new QSystemPerformanceMetrics(dropoutNumbers[0], meanQLengths[0], meanUtilizations[0])
         });
     }
 

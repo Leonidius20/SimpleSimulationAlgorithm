@@ -9,7 +9,7 @@ public class Element {
 
     @Getter @Setter private String name;
     @Getter @Setter private double currentTime = 0.0;
-    @Getter @Setter private double nextEventTime = 0.0;
+    @Setter private double nextEventTime = 0.0;
     @Getter @Setter private double meanServiceTime;
     @Getter @Setter private double serviceTimeStdDeviation;
     @Getter @Setter private ProbabilityDistribution distribution;
@@ -89,5 +89,7 @@ public class Element {
     public void doStatistics(double delta) {
 
     }
+
+    public double getNextEventTime() {return nextEventTime; }
 
 }
