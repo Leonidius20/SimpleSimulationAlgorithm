@@ -87,13 +87,8 @@ public class QueueingSystem extends Element {
     @Override
     public void onServiceCompletion() {
         super.onServiceCompletion();
-        // super.setNextEventTime(Double.MAX_VALUE);
 
-        // TODO: chane state of te element that fifinshed comlition
-        // and also chage it's future event time
-        // just save index of processor it in a class field
 
-        //super.setState(0);
         states[nextEventProcessorIndex] = 0;
         nextEventTimes[nextEventProcessorIndex] = Double.MAX_VALUE;
         this.nextEventProcessorIndex = findMinIndex(nextEventTimes);
@@ -122,8 +117,8 @@ public class QueueingSystem extends Element {
     @Override
     public void printInfo() {
         System.out.println(getName() + " states= " + Arrays.toString(states) +
-                " quantity = " + getNumberOfCustomersServed() +
-                " tnext= " + getNextEventTime());
+                " quantity served = " + getNumberOfCustomersServed() +
+                " tnext= " + getNextEventTime() + " queue length " + getCurrentQueueLength());
         System.out.println("failure = " + this.getNumberOfDropouts());
     }
 
