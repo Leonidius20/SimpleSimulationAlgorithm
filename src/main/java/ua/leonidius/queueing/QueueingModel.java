@@ -1,5 +1,7 @@
 package ua.leonidius.queueing;
 
+import ua.leonidius.queueing.beans.output_params.OutputParameters;
+import ua.leonidius.queueing.beans.output_params.QSystemPerformanceMetrics;
 import ua.leonidius.queueing.elements.Element;
 import ua.leonidius.queueing.elements.QueueingSystem;
 
@@ -18,7 +20,7 @@ public class QueueingModel {
         listOfElements = elements;
     }
 
-    public void simulate(double simulationTime) {
+    public OutputParameters simulate(double simulationTime) {
         while (currentTime < simulationTime) {
 
             var nextEventElement =
@@ -28,9 +30,9 @@ public class QueueingModel {
             nextEventTime = nextEventElement.getNextEventTime();
             nextEventId = nextEventElement.getId();
 
-            System.out.println("\nIt's time for event in " +
-                    nextEventElement.getName() +
-                    ", id="+ nextEventId + ", time=" + nextEventTime);
+            //System.out.println("\nIt's time for event in " +
+            //        nextEventElement.getName() +
+             //       ", id="+ nextEventId + ", time=" + nextEventTime);
 
 
             double delta = nextEventTime - currentTime;
@@ -53,36 +55,46 @@ public class QueueingModel {
             printIterationInfo();
         }
 
-        printFinalResult();
+        return getFinalResult();
     }
 
     public void printIterationInfo() {
         listOfElements.forEach(Element::printInfo);
     }
 
-    public void printFinalResult() {
-        System.out.println("\n-------------RESULTS-------------");
+    public OutputParameters getFinalResult() {
+        // System.out.println("\n-------------RESULTS-------------");
 
+
+        var createElement = listOfElements.get(0);
+        int totalNumCustomers = createElement.getNumberOfCustomersServed();
+
+        double[] meanQLengths = new double[3];
+        double[] meanUtilizations = new double[3];
+        int[] dropoutNumbers = new int[3];
+
+        int totalDropouts = 0;
         double totalDropoutProbability = 1;
 
-        for (Element e : listOfElements) {
-            e.printResult();
-            if (e instanceof QueueingSystem qSystem) {
-                double meanQueueLength = qSystem.getMeanQueueLengthAccumulator() / currentTime;
-                double meanUtilization = qSystem.getMeanUtilizationAccumulator() / currentTime;
-                double dropoutProbability = qSystem.getNumberOfDropouts()
-                        / (double)qSystem.getNumberOfCustomersServed();
-                totalDropoutProbability *= dropoutProbability;
+        for (int i = 1; i < listOfElements.size(); i++) {
+            var qSystem = (QueueingSystem) listOfElements.get(i);
 
-                System.out.println(
-                        "Q SYSTEM " + qSystem.getName()
-                                + "\nmean length of queue = " + meanQueueLength
-                                + "\nmean utilization = " + meanUtilization
-                                + "\nfailure probability = " + dropoutProbability);
-            }
+            meanQLengths[i - 1] = qSystem.getMeanQueueLengthAccumulator() / currentTime;
+            meanUtilizations[i - 1] = qSystem.getMeanUtilizationAccumulator() / currentTime;
+            dropoutNumbers[i - 1] = qSystem.getNumberOfDropouts();
+
+            totalDropouts += qSystem.getNumberOfDropouts();
+
+            double dropoutProbability = qSystem.getNumberOfDropouts()
+                    / (double) qSystem.getNumberOfCustomersServed();
+            totalDropoutProbability *= dropoutProbability;
         }
 
-        System.out.println("Total Dropout Probability: " + totalDropoutProbability);
+        return new OutputParameters(totalNumCustomers, totalDropoutProbability, new QSystemPerformanceMetrics[]{
+                new QSystemPerformanceMetrics(dropoutNumbers[0], meanQLengths[0], meanUtilizations[0]),
+                new QSystemPerformanceMetrics(dropoutNumbers[1], meanQLengths[1], meanUtilizations[1]),
+                new QSystemPerformanceMetrics(dropoutNumbers[2], meanQLengths[2], meanUtilizations[2])
+        });
     }
 
 }

@@ -1,5 +1,6 @@
 package ua.leonidius.queueing.beans.output_params;
 
+// totalNumCustomers, totalDropoutProbability, numDropouts1, meanQLength1, meanUtilization1, numDropouts2, meanQLength2, meanUtilization2, numDropouts3, meanQLength3, meanUtilization3
 public record OutputParameters(
         int totalNumCustomers, double totalDropoutProbability,
         QSystemPerformanceMetrics[] qSystemsPerformanceMetrics
