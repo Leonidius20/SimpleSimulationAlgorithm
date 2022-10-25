@@ -45,6 +45,24 @@ public class Element {
         name = "element" + id;
     }
 
+    public Element(ProbabilityDistribution distribution, double[] distParams) {
+        name = "anonymous";
+
+        if (distribution == ProbabilityDistribution.EXPONENTIAL
+                || distribution == ProbabilityDistribution.NONE) {
+            this.meanServiceTime = distParams[0];
+        } else {
+            this.meanServiceTime = distParams[0];
+            this.serviceTimeStdDeviation = distParams[1];
+        }
+
+        this.distribution = distribution;
+
+        id = nextId;
+        nextId++;
+        name = "element" + id;
+    }
+
     public Element(String nameOfElement, double meanServiceTime) {
         name = nameOfElement;
 

@@ -1,9 +1,11 @@
 package ua.leonidius.queueing.elements;
 
+import ua.leonidius.queueing.utils.ProbabilityDistribution;
+
 public class Create extends Element {
 
-    public Create(double creationInterval) {
-        super(creationInterval);
+    public Create(ProbabilityDistribution distribution, double[] distParams) {
+        super(distribution, distParams);
     }
 
     @Override

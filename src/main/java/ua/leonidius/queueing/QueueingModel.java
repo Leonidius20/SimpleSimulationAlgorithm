@@ -96,7 +96,7 @@ public class QueueingModel {
         return new OutputParameters(totalNumCustomers, totalDropoutProbability, new QSystemPerformanceMetrics[]{
                 new QSystemPerformanceMetrics(dropoutNumbers[0], meanQLengths[0], meanUtilizations[0]),
                 new QSystemPerformanceMetrics(dropoutNumbers[1], meanQLengths[1], meanUtilizations[1]),
-                new QSystemPerformanceMetrics(dropoutNumbers[2], meanQLengths[2], meanUtilizations[2]),
+                // new QSystemPerformanceMetrics(dropoutNumbers[2], meanQLengths[2], meanUtilizations[2]),
         });
     }
 

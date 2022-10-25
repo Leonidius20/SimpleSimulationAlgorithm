@@ -20,6 +20,12 @@ public class QueueingSystem extends Element {
     @Getter private final double[] nextEventTimes;
 
     /**
+     * A queueing system where customers can move if the queue
+     * is shorter there
+     */
+    @Getter @Setter private QueueingSystem twinQSystem = null;
+
+    /**
      * Index of processor, in which the next event is going to happen,
      * i.e. index of processor that will finish serving the soonest
      */
@@ -27,6 +33,12 @@ public class QueueingSystem extends Element {
 
     @Getter private double meanQueueLengthAccumulator;
     @Getter private double meanUtilizationAccumulator;
+
+    /**
+     * Number of customers from the twin system,
+     * who chose to swutch to this system
+     */
+    @Getter private int numberOfRefugees = 0;
 
     public QueueingSystem(double delay) {
         super(delay);
@@ -88,11 +100,13 @@ public class QueueingSystem extends Element {
     public void onServiceCompletion() {
         super.onServiceCompletion();
 
-
+        // making the appropriate processor free
         states[nextEventProcessorIndex] = 0;
         nextEventTimes[nextEventProcessorIndex] = Double.MAX_VALUE;
+
         this.nextEventProcessorIndex = findMinIndex(nextEventTimes);
 
+        // accepting a customer form q for service
         if (getCurrentQueueLength() > 0) {
             setCurrentQueueLength(getCurrentQueueLength() - 1);
 
@@ -104,9 +118,22 @@ public class QueueingSystem extends Element {
                     this.nextEventProcessorIndex = findMinIndex(nextEventTimes);
                 }
             }
+        }
 
 
+        // acceoting a refugee from a twin system (is possible)
+        if (twinQSystem != null) {
+            // if the twin's system q is at least 2 customers longer than our q
+            // and we have a free place is our q
+            if (currentQueueLength < queueCapacity
+                    && twinQSystem.getCurrentQueueLength() - currentQueueLength >= 2) {
+                // stealing a guy from their q
+                twinQSystem.setCurrentQueueLength(twinQSystem.getCurrentQueueLength() - 1);
 
+                onCustomerArrival();
+
+                numberOfRefugees++;
+            }
         }
 
         if (getNextElement() != null) {
