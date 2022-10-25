@@ -34,12 +34,7 @@ public class Main {
         list.add(queueingSystem2);
 
         QueueingModel model = new QueueingModel(list);
-        var out = model.simulate(1000.0);
-
-        System.out.println("totalNumCustomers, totalDropoutProbability, numDropouts1, meanQLength1, meanUtilization1, numDropouts2, meanQLength2, meanUtilization2\n"/*, numDropouts3, meanQLength3, meanUtilization3\n"*/);
-
-        System.out.println(out.toString());
-
+        model.simulate(1000.0);
     }
 
 }

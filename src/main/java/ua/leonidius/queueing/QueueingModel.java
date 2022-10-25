@@ -76,6 +76,9 @@ public class QueueingModel {
         int totalDropouts = 0;
         int totalCustomersServed = 0;
 
+        int meanNumOfCustomersInModel = 0;
+        int totalRefugees = 0;
+
         for (int i = 1; i < listOfElements.size(); i++) {
             var qSystem = (QueueingSystem) listOfElements.get(i);
 
@@ -88,16 +91,30 @@ public class QueueingModel {
 
             double dropoutProbability = qSystem.getNumberOfDropouts()
                     / (double) (qSystem.getNumberOfCustomersServed() + qSystem.getNumberOfDropouts());
+
+            meanNumOfCustomersInModel +=
+                    (qSystem.getMeanNumberOfCustomersInSystemAccumulator() / currentTime);
+            totalRefugees += qSystem.getNumberOfRefugees();
         }
 
         double totalDropoutProbability = totalDropouts
                 / (double) (totalCustomersServed + totalDropouts);
 
-        return new OutputParameters(totalNumCustomers, totalDropoutProbability, new QSystemPerformanceMetrics[]{
-                new QSystemPerformanceMetrics(dropoutNumbers[0], meanQLengths[0], meanUtilizations[0]),
-                new QSystemPerformanceMetrics(dropoutNumbers[1], meanQLengths[1], meanUtilizations[1]),
-                // new QSystemPerformanceMetrics(dropoutNumbers[2], meanQLengths[2], meanUtilizations[2]),
-        });
+        System.out.println("totalNumCustomersGenerated, meanNumberOfClientsInSystem, meanLeavingInverval, meanTimeInSystem, totalDropoutProbability, totalRefugees, meanQLength1, meanUtilization1, meanQLength2, meanUtilization2\n"/*, numDropouts3, meanQLength3, meanUtilization3\n"*/);
+        var sb = new StringBuilder();
+        sb.append(totalNumCustomers).append(',');
+        sb.append(meanNumOfCustomersInModel).append(','); // TODO: how is it 12 when there are only 8 max possible?
+        sb.append("not implemented").append(',');
+        sb.append("not implemented").append(',');
+        sb.append(totalDropoutProbability).append(',');
+        sb.append(totalRefugees).append(',');
+        sb.append(meanQLengths[0]).append(',');
+        sb.append(meanUtilizations[0]).append(',');
+        sb.append(meanQLengths[1]).append(',');
+        sb.append(meanUtilizations[1]).append(',');
+        System.out.println(sb.toString());
+
+        return null;
     }
 
 }

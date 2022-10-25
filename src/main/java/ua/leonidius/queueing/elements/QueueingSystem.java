@@ -35,6 +35,14 @@ public class QueueingSystem extends Element {
     @Getter private double meanUtilizationAccumulator;
 
     /**
+     * Accumulates the values for the mean number of customers in the system
+     * (being processed and in the queue). In order to get the mean value,
+     * the value of this variable has to be divided by the total simulation
+     * time.
+     */
+    @Getter private double meanNumberOfCustomersInSystemAccumulator;
+
+    /**
      * Number of customers from the twin system,
      * who chose to swutch to this system
      */
@@ -154,7 +162,10 @@ public class QueueingSystem extends Element {
         meanQueueLengthAccumulator = getMeanQueueLengthAccumulator() + currentQueueLength * delta;
         meanUtilizationAccumulator = getMeanUtilizationAccumulator()
                 + (Arrays.stream(states).sum() / (double)numberOfProcessors) * delta;
-        // TODO: replace getState() when state = blocked is introduced
+
+        meanNumberOfCustomersInSystemAccumulator +=
+                currentQueueLength + Arrays.stream(states).sum();
+        // TODO: change if states become not only 0 and 1
     }
 
     @Override
