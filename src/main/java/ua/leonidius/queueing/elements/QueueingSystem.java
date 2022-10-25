@@ -136,7 +136,7 @@ public class QueueingSystem extends Element {
         }
 
 
-        // acceoting a refugee from a twin system (is possible)
+        // accepting a refugee from a twin system (is possible)
         if (twinQSystem != null) {
             // if the twin's system q is at least 2 customers longer than our q
             // and we have a free place is our q

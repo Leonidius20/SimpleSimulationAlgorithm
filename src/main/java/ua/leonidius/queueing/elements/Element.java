@@ -13,7 +13,7 @@ public class Element {
     @Getter @Setter private double meanServiceTime;
     @Getter @Setter private double serviceTimeStdDeviation;
     @Getter @Setter private ProbabilityDistribution distribution;
-    @Getter private int numberOfCustomersServed;
+    @Getter @Setter private int numberOfCustomersServed;
     @Getter @Setter private int state = 0;
 
     /**

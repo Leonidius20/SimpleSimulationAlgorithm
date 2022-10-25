@@ -9,10 +9,22 @@ import lombok.Getter;
 public class Dispose extends Element {
 
     /**
-     *  An accumulator of timestamps at which customers arrive to this elemet
+     *  An accumulator of timestamps at which customers arrive to this element
      *  Used to calculate mean time clients spend in the system.
      */
     @Getter private double customerArrivalTimesAccumulator;
+
+    /**
+     * Accumulates times between customers leaving the system.
+     * Needed to calculate the avg time between customers leaving the system.
+     */
+    @Getter private double timesBetweenLeavingAccumulator;
+
+    /**
+     * Timestamp of when the last served customer left the  system.
+     * Needed to calculate the avg time between customers leaving the system.
+     */
+    private double lastLeavingTimestamp = -1;
 
     public Dispose() {
         this.generatesEvents = false;
@@ -22,6 +34,15 @@ public class Dispose extends Element {
     @Override
     public void onCustomerArrival() {
         customerArrivalTimesAccumulator += getCurrentTime();
+
+        if (lastLeavingTimestamp != -1) { // if this is the first time a customer leaves the system
+            timesBetweenLeavingAccumulator += (getCurrentTime() - lastLeavingTimestamp);
+        }
+        lastLeavingTimestamp = getCurrentTime();
+
+        // TODO: maybe actaully amke it a part of the event system
+        // with end event happening right away
+        setNumberOfCustomersServed(getNumberOfCustomersServed() + 1);
     }
 
 }

@@ -1,7 +1,6 @@
 package ua.leonidius.queueing;
 
 import ua.leonidius.queueing.beans.output_params.OutputParameters;
-import ua.leonidius.queueing.beans.output_params.QSystemPerformanceMetrics;
 import ua.leonidius.queueing.elements.Create;
 import ua.leonidius.queueing.elements.Dispose;
 import ua.leonidius.queueing.elements.Element;
@@ -11,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class QueueingModel {
 
@@ -123,11 +121,14 @@ public class QueueingModel {
         double meanTimeInSystem = (disposeTimesAcc + dropoutTimesAcc - customerArrivalTimesAcc)
                 / totalNumCustomersCreated;
 
-        System.out.println("totalNumCustomersGenerated, meanNumberOfClientsInSystem, meanLeavingInverval, meanTimeInSystem, totalDropoutProbability, totalRefugees, meanQLength1, meanQLength2, meanUtilization1, meanUtilization2\n"/*, numDropouts3, meanQLength3, meanUtilization3\n"*/);
+        double meanLeavingInterval = disposeElement.getTimesBetweenLeavingAccumulator()
+                / disposeElement.getNumberOfCustomersServed();
+
+        System.out.println("totalNumCustomersGenerated, meanNumberOfClientsInSystem, meanLeavingInterval, meanTimeInSystem, totalDropoutProbability, totalRefugees, meanQLength1, meanQLength2, meanUtilization1, meanUtilization2\n"/*, numDropouts3, meanQLength3, meanUtilization3\n"*/);
         var sb = new StringBuilder();
         sb.append(totalNumCustomersCreated).append(',');
         sb.append(meanNumOfCustomersInModel).append(',');
-        sb.append("not implemented").append(',');
+        sb.append(meanLeavingInterval).append(',');
         sb.append(meanTimeInSystem).append(',');
         sb.append(totalDropoutProbability).append(',');
         sb.append(totalRefugees).append(',');
