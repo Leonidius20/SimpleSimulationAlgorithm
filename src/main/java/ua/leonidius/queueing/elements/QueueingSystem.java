@@ -164,7 +164,7 @@ public class QueueingSystem extends Element {
                 + (Arrays.stream(states).sum() / (double)numberOfProcessors) * delta;
 
         meanNumberOfCustomersInSystemAccumulator +=
-                currentQueueLength + Arrays.stream(states).sum();
+                (currentQueueLength + Arrays.stream(states).sum()) * delta;
         // TODO: change if states become not only 0 and 1
     }
 

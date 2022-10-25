@@ -76,7 +76,7 @@ public class QueueingModel {
         int totalDropouts = 0;
         int totalCustomersServed = 0;
 
-        int meanNumOfCustomersInModel = 0;
+        double meanNumOfCustomersInModel = 0;
         int totalRefugees = 0;
 
         for (int i = 1; i < listOfElements.size(); i++) {
@@ -93,7 +93,7 @@ public class QueueingModel {
                     / (double) (qSystem.getNumberOfCustomersServed() + qSystem.getNumberOfDropouts());
 
             meanNumOfCustomersInModel +=
-                    (qSystem.getMeanNumberOfCustomersInSystemAccumulator() / currentTime);
+                    ((double)qSystem.getMeanNumberOfCustomersInSystemAccumulator() / currentTime);
             totalRefugees += qSystem.getNumberOfRefugees();
         }
 
