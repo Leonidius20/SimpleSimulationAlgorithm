@@ -24,6 +24,12 @@ public class Element {
     private static int nextId = 0;
     @Getter @Setter private int id;
 
+    /**
+     * Whether this element can generate events (service completion for customer)
+     * and should therefore be appropriately processed by simulation algorithm
+     */
+    @Getter protected boolean generatesEvents = true;
+
     public Element() {
         meanServiceTime = 1.0;
 

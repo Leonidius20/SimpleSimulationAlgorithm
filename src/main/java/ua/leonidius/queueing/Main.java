@@ -24,6 +24,11 @@ public class Main {
         queueingSystem1.setTwinQSystem(queueingSystem2);
         queueingSystem2.setTwinQSystem(queueingSystem1);
 
+        var dispose = new Dispose();
+
+        queueingSystem1.setNextElement(dispose);
+        queueingSystem2.setNextElement(dispose);
+
         var branching = new PriorityBranching(new QueueingSystem[]{ queueingSystem1, queueingSystem2  }, new int[] { 1, 2 });
 
         creationElement.setNextElement(branching);
@@ -32,9 +37,13 @@ public class Main {
         list.add(creationElement);
         list.add(queueingSystem1);
         list.add(queueingSystem2);
+        list.add(dispose);
 
         QueueingModel model = new QueueingModel(list);
         model.simulate(1000.0);
+
+        // ) середній час перебування клієнта в банку - сума часів. коли елемент вийшов з системи мінус сума часів, коли війшов всистему (окрім дропауьів) поділити на всю кількість оброблених додіків
+        // середній інтервал часу між від'їздами клієнтів від вікон - в кожній СМО сумувати інтервали між івентами та потім поділити їх на кількість оброблдених додіків
     }
 
 }

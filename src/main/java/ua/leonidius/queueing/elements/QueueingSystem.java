@@ -43,6 +43,12 @@ public class QueueingSystem extends Element {
     @Getter private double meanNumberOfCustomersInSystemAccumulator;
 
     /**
+     * Accumulates timestamps at which customers dropped out. Needed to
+     * calculate mean time a customer spends in the system.
+     */
+    @Getter private double dropoutTimestampsAccumulator = 0;
+
+    /**
      * Number of customers from the twin system,
      * who chose to swutch to this system
      */
@@ -101,6 +107,7 @@ public class QueueingSystem extends Element {
             setCurrentQueueLength(getCurrentQueueLength() + 1);
         } else {
             numberOfDropouts++;
+            dropoutTimestampsAccumulator += getCurrentTime();
         }
     }
 

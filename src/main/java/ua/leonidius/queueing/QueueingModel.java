@@ -2,11 +2,16 @@ package ua.leonidius.queueing;
 
 import ua.leonidius.queueing.beans.output_params.OutputParameters;
 import ua.leonidius.queueing.beans.output_params.QSystemPerformanceMetrics;
+import ua.leonidius.queueing.elements.Create;
+import ua.leonidius.queueing.elements.Dispose;
 import ua.leonidius.queueing.elements.Element;
 import ua.leonidius.queueing.elements.QueueingSystem;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class QueueingModel {
 
@@ -25,6 +30,7 @@ public class QueueingModel {
 
             var nextEventElement =
                     listOfElements.stream()
+                            .filter(Element::isGeneratesEvents)
                             .min(Comparator.comparingDouble(Element::getNextEventTime))
                             .get();
             nextEventTime = nextEventElement.getNextEventTime();
@@ -47,7 +53,7 @@ public class QueueingModel {
             nextEventElement.onServiceCompletion(); // it depends on updated currentTime
 
             for (Element e : listOfElements) {
-                if (e.getNextEventTime() == currentTime) {
+                if (e.isGeneratesEvents() && e.getNextEventTime() == currentTime) {
                     e.onServiceCompletion();
                 }
             }
@@ -66,12 +72,20 @@ public class QueueingModel {
         System.out.println("\n-------------RESULTS-------------");
 
 
-        var createElement = listOfElements.get(0);
-        int totalNumCustomers = createElement.getNumberOfCustomersServed();
+        var createElement = (Create)listOfElements.stream()
+                .filter(e -> e instanceof Create).findFirst().get();
+        int totalNumCustomersCreated = createElement.getNumberOfCustomersServed();
+        double customerArrivalTimesAcc = createElement.getCustomerEnterTimesAccumulator();
 
-        double[] meanQLengths = new double[3];
-        double[] meanUtilizations = new double[3];
-        int[] dropoutNumbers = new int[3];
+        var disposeElement = (Dispose)listOfElements.stream()
+                .filter(e -> e instanceof Dispose).findFirst().get();
+        double disposeTimesAcc = disposeElement.getCustomerArrivalTimesAccumulator();
+
+        double dropoutTimesAcc = 0;
+
+        List<Double> meanQLengths = new LinkedList<>();
+        List<Double> meanUtilizations =  new LinkedList<>();
+        List<Integer> dropoutNumbers = new LinkedList<>();
 
         int totalDropouts = 0;
         int totalCustomersServed = 0;
@@ -79,40 +93,53 @@ public class QueueingModel {
         double meanNumOfCustomersInModel = 0;
         int totalRefugees = 0;
 
-        for (int i = 1; i < listOfElements.size(); i++) {
-            var qSystem = (QueueingSystem) listOfElements.get(i);
+        var qSystems = listOfElements.stream()
+                .filter(e -> e instanceof QueueingSystem)
+                .map(e -> (QueueingSystem)e)
+                .sorted(Comparator.comparingInt(QueueingSystem::getId))
+                .toList();
 
-            meanQLengths[i - 1] = qSystem.getMeanQueueLengthAccumulator() / currentTime;
-            meanUtilizations[i - 1] = qSystem.getMeanUtilizationAccumulator() / currentTime;
-            dropoutNumbers[i - 1] = qSystem.getNumberOfDropouts();
+        for (var qSystem : qSystems) {
+            meanQLengths.add(qSystem.getMeanQueueLengthAccumulator() / currentTime);
+            meanUtilizations.add(qSystem.getMeanUtilizationAccumulator() / currentTime);
+            dropoutNumbers.add(qSystem.getNumberOfDropouts());
 
             totalDropouts += qSystem.getNumberOfDropouts();
             totalCustomersServed += qSystem.getNumberOfCustomersServed();
 
-            double dropoutProbability = qSystem.getNumberOfDropouts()
-                    / (double) (qSystem.getNumberOfCustomersServed() + qSystem.getNumberOfDropouts());
+            //double dropoutProbability = qSystem.getNumberOfDropouts()
+            //        / (double) (qSystem.getNumberOfCustomersServed() + qSystem.getNumberOfDropouts());
 
             meanNumOfCustomersInModel +=
                     ((double)qSystem.getMeanNumberOfCustomersInSystemAccumulator() / currentTime);
             totalRefugees += qSystem.getNumberOfRefugees();
+
+            dropoutTimesAcc += qSystem.getDropoutTimestampsAccumulator();
         }
 
         double totalDropoutProbability = totalDropouts
                 / (double) (totalCustomersServed + totalDropouts);
 
-        System.out.println("totalNumCustomersGenerated, meanNumberOfClientsInSystem, meanLeavingInverval, meanTimeInSystem, totalDropoutProbability, totalRefugees, meanQLength1, meanUtilization1, meanQLength2, meanUtilization2\n"/*, numDropouts3, meanQLength3, meanUtilization3\n"*/);
+        double meanTimeInSystem = (disposeTimesAcc + dropoutTimesAcc - customerArrivalTimesAcc)
+                / totalNumCustomersCreated;
+
+        System.out.println("totalNumCustomersGenerated, meanNumberOfClientsInSystem, meanLeavingInverval, meanTimeInSystem, totalDropoutProbability, totalRefugees, meanQLength1, meanQLength2, meanUtilization1, meanUtilization2\n"/*, numDropouts3, meanQLength3, meanUtilization3\n"*/);
         var sb = new StringBuilder();
-        sb.append(totalNumCustomers).append(',');
-        sb.append(meanNumOfCustomersInModel).append(','); // TODO: how is it 12 when there are only 8 max possible?
+        sb.append(totalNumCustomersCreated).append(',');
+        sb.append(meanNumOfCustomersInModel).append(',');
         sb.append("not implemented").append(',');
-        sb.append("not implemented").append(',');
+        sb.append(meanTimeInSystem).append(',');
         sb.append(totalDropoutProbability).append(',');
         sb.append(totalRefugees).append(',');
-        sb.append(meanQLengths[0]).append(',');
-        sb.append(meanUtilizations[0]).append(',');
-        sb.append(meanQLengths[1]).append(',');
-        sb.append(meanUtilizations[1]).append(',');
-        System.out.println(sb.toString());
+
+        for (var meanQLength : meanQLengths) {
+            sb.append(meanQLength).append(',');
+        }
+        for (var utilization : meanUtilizations) {
+            sb.append(utilization).append(',');
+        }
+
+        System.out.println(sb);
 
         return null;
     }

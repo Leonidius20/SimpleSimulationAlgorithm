@@ -29,6 +29,7 @@ public class ProbabilisticBranching extends Element {
             }
         }
 
+        this.generatesEvents = false;
         this.setNextEventTime(Double.MAX_VALUE); // do not perform events
 
         this.elements = elements;

@@ -16,6 +16,7 @@ public class PriorityBranching extends Element {
             throw new RuntimeException("There should be at least 1 path in branching");
         }
 
+        this.generatesEvents = false;
         this.setNextEventTime(Double.MAX_VALUE); // do not perform events
 
         this.elements = elements;
