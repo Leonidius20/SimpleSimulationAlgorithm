@@ -74,7 +74,7 @@ public class QueueingModel {
         int[] dropoutNumbers = new int[3];
 
         int totalDropouts = 0;
-        double totalDropoutProbability = 1;
+        int totalCustomersServed = 0;
 
         for (int i = 1; i < listOfElements.size(); i++) {
             var qSystem = (QueueingSystem) listOfElements.get(i);
@@ -84,16 +84,19 @@ public class QueueingModel {
             dropoutNumbers[i - 1] = qSystem.getNumberOfDropouts();
 
             totalDropouts += qSystem.getNumberOfDropouts();
+            totalCustomersServed += qSystem.getNumberOfCustomersServed();
 
             double dropoutProbability = qSystem.getNumberOfDropouts()
-                    / (double) qSystem.getNumberOfCustomersServed();
-            totalDropoutProbability *= dropoutProbability;
+                    / (double) (qSystem.getNumberOfCustomersServed() + qSystem.getNumberOfDropouts());
         }
 
+        double totalDropoutProbability = totalDropouts
+                / (double) (totalCustomersServed + totalDropouts);
 
         return new OutputParameters(totalNumCustomers, totalDropoutProbability, new QSystemPerformanceMetrics[]{
                 new QSystemPerformanceMetrics(dropoutNumbers[0], meanQLengths[0], meanUtilizations[0]),
                 new QSystemPerformanceMetrics(dropoutNumbers[1], meanQLengths[1], meanUtilizations[1]),
+                new QSystemPerformanceMetrics(dropoutNumbers[2], meanQLengths[2], meanUtilizations[2]),
         });
     }
 

@@ -3,13 +3,18 @@ package ua.leonidius.queueing.elements;
 import java.util.Arrays;
 import java.util.Random;
 
-public class Branching extends Element {
+/**
+ * Represents a branching where the path is selected based on probability.
+ * You should not include elements of this class in the list of elements
+ * when constructing a QueueingModel.
+ */
+public class ProbabilisticBranching extends Element {
 
     private final Element[] elements;
     private final double[] probabilities;
     private final Random randomG = new Random();
 
-    public Branching(Element[] elements, double[] probabilities) {
+    public ProbabilisticBranching(Element[] elements, double[] probabilities) {
         if (elements.length != probabilities.length) {
             throw new RuntimeException("Number of elements and probabilities supplied do not match");
         }
