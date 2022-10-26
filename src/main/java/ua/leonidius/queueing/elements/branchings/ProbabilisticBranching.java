@@ -1,6 +1,7 @@
-package ua.leonidius.queueing.elements;
+package ua.leonidius.queueing.elements.branchings;
 
 import ua.leonidius.queueing.Customer;
+import ua.leonidius.queueing.elements.Element;
 
 import java.util.Arrays;
 import java.util.Random;

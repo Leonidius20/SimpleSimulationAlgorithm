@@ -1,4 +1,4 @@
-package ua.leonidius.queueing.elements;
+package ua.leonidius.queueing.elements.systems;
 
 import ua.leonidius.queueing.Customer;
 import ua.leonidius.queueing.distributions.ProbabilityDistribution;
@@ -12,6 +12,10 @@ public class InfiniteProcessorsQSystem extends QueueingSystem {
 
     public InfiniteProcessorsQSystem(ProbabilityDistribution distribution, String name, Map<Integer, Integer> transformationRules) {
         super(1, distribution, new NoQueue(), name, transformationRules);
+    }
+
+    public InfiniteProcessorsQSystem(ProbabilityDistribution distribution, String name) {
+        super(1, distribution, new NoQueue(), name);
     }
 
     @Override

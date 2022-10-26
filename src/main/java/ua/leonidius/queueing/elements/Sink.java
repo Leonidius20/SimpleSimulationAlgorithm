@@ -9,7 +9,7 @@ import java.util.Arrays;
  * The end element of the model, where customers are destroyed. Can be used to
  * gather statistics at the end of the model.
  */
-public class Dispose extends Element {
+public class Sink extends Element {
 
     /**
      *  An accumulator of timestamps at which customers arrive to this element
@@ -34,7 +34,7 @@ public class Dispose extends Element {
     //TODO; remove
     @Getter private final int[] numOfEachType = new int[3];
 
-    public Dispose() {
+    public Sink() {
         this.generatesEvents = false;
         setNextEventTime(Double.MAX_VALUE); // no events, although it's not added to model anyway
         Arrays.fill(numOfEachType, 0);

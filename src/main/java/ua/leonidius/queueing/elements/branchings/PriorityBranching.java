@@ -1,6 +1,8 @@
-package ua.leonidius.queueing.elements;
+package ua.leonidius.queueing.elements.branchings;
 
 import ua.leonidius.queueing.Customer;
+import ua.leonidius.queueing.elements.Element;
+import ua.leonidius.queueing.elements.systems.QueueingSystem;
 
 import java.util.ArrayList;
 

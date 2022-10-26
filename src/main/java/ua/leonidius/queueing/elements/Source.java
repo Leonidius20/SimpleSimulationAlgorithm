@@ -7,7 +7,7 @@ import ua.leonidius.queueing.distributions.ProbabilityDistribution;
 import java.util.Arrays;
 import java.util.Random;
 
-public class Create extends Element {
+public class Source extends Element {
 
     /**
      * An accumulator of timestamps at which customers where
@@ -21,7 +21,7 @@ public class Create extends Element {
 
     private final Random randomG = new Random();
 
-    public Create(ProbabilityDistribution distribution,
+    public Source(ProbabilityDistribution distribution,
                   int[] customerTypes, double[] probabilities) {
         super(distribution);
 

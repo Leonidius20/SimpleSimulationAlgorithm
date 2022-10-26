@@ -1,9 +1,9 @@
 package ua.leonidius.queueing;
 
-import ua.leonidius.queueing.elements.Create;
-import ua.leonidius.queueing.elements.Dispose;
+import ua.leonidius.queueing.elements.Source;
+import ua.leonidius.queueing.elements.Sink;
 import ua.leonidius.queueing.elements.Element;
-import ua.leonidius.queueing.elements.QueueingSystem;
+import ua.leonidius.queueing.elements.systems.QueueingSystem;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -69,13 +69,13 @@ public class QueueingModel {
         System.out.println("\n-------------RESULTS-------------");
 
 
-        var createElement = (Create)listOfElements.stream()
-                .filter(e -> e instanceof Create).findFirst().get();
+        var createElement = (Source)listOfElements.stream()
+                .filter(e -> e instanceof Source).findFirst().get();
         int totalNumCustomersCreated = createElement.getNumberOfCustomersServed();
         // double customerArrivalTimesAcc = createElement.getCustomerEnterTimesAccumulator();
 
-        var disposeElement = (Dispose)listOfElements.stream()
-                .filter(e -> e instanceof Dispose).findFirst().get();
+        var disposeElement = (Sink)listOfElements.stream()
+                .filter(e -> e instanceof Sink).findFirst().get();
         // double disposeTimesAcc = disposeElement.getCustomerArrivalTimesAccumulator();
 
         // double dropoutTimesAcc = 0;
@@ -111,6 +111,12 @@ public class QueueingModel {
                     ((double)qSystem.getMeanNumberOfCustomersInSystemAccumulator() / currentTime);
             totalRefugees += qSystem.getNumberOfRefugees();
 
+            System.out.println("SYSTEM " + qSystem.getName());
+            System.out.println("Type 1 " + qSystem.getNumOfEachType()[0]);
+            System.out.println("Type 2 " + qSystem.getNumOfEachType()[1]);
+            System.out.println("Type 3 " + qSystem.getNumOfEachType()[2]);
+            System.out.println();
+
             // dropoutTimesAcc += qSystem.getDropoutTimestampsAccumulator();
         }
 
@@ -141,9 +147,9 @@ public class QueueingModel {
 
         System.out.println(sb);
 
-        System.out.println("Type 1 " + disposeElement.getNumOfEachType()[0]);
-        System.out.println("Type 2 " + disposeElement.getNumOfEachType()[1]);
-        System.out.println("Type 3 " + disposeElement.getNumOfEachType()[2]);
+        System.out.println("Sinked of Type 1 " + disposeElement.getNumOfEachType()[0]);
+        System.out.println("Sinked of Type 2 " + disposeElement.getNumOfEachType()[1]);
+        System.out.println("Sinked of Type 3 " + disposeElement.getNumOfEachType()[2]);
     }
 
 }

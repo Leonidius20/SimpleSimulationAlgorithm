@@ -1,9 +1,10 @@
-package ua.leonidius.queueing.elements;
+package ua.leonidius.queueing.elements.systems;
 
 import lombok.Getter;
 import lombok.Setter;
 import ua.leonidius.queueing.Customer;
 import ua.leonidius.queueing.distributions.ProbabilityDistribution;
+import ua.leonidius.queueing.elements.Element;
 
 import java.util.*;
 
@@ -11,6 +12,9 @@ import java.util.*;
  * A Queueing system element (Система масового обслуговування)
  */
 public class QueueingSystem extends Element {
+
+    // TODO remove
+    @Getter private final int[] numOfEachType = new int[3];
 
     protected final ArrayList<Processor> processors;
 
@@ -77,6 +81,8 @@ public class QueueingSystem extends Element {
 
     @Override
     public void onCustomerArrival(Customer customer) {
+        numOfEachType[customer.type() - 1]++; // TODO remove
+
         var freeProcessorOptional = processors.stream()
                 .filter(Processor::isFree).findFirst();
 
@@ -237,7 +243,7 @@ public class QueueingSystem extends Element {
     /**
      * Represents the queue in front of processors in this QueueingSystem
      */
-    static interface QSQueue {
+    public static interface QSQueue {
 
         boolean isFull();
 
