@@ -1,6 +1,7 @@
 package ua.leonidius.queueing.elements;
 
 import lombok.Getter;
+import ua.leonidius.queueing.Customer;
 import ua.leonidius.queueing.utils.ProbabilityDistribution;
 
 public class Create extends Element {
@@ -21,7 +22,10 @@ public class Create extends Element {
         super.onServiceCompletion();
         super.setNextEventTime(super.getCurrentTime() + super.getServiceTime());
         customerEnterTimesAccumulator += getCurrentTime();
-        super.getNextElement().onCustomerArrival();
+
+        var customer = new Customer(1, getCurrentTime());
+
+        getNextElement().onCustomerArrival(customer);
     }
 
 }

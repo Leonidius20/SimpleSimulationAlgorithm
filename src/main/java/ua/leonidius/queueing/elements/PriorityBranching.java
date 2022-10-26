@@ -1,5 +1,7 @@
 package ua.leonidius.queueing.elements;
 
+import ua.leonidius.queueing.Customer;
+
 import java.util.ArrayList;
 
 public class PriorityBranching extends Element {
@@ -24,20 +26,20 @@ public class PriorityBranching extends Element {
     }
 
     @Override
-    public void onCustomerArrival() {
-        super.onCustomerArrival(); // it's empty anyway
+    public void onCustomerArrival(Customer customer) {
+        super.onCustomerArrival(customer); // it's empty anyway
 
         // finding the q systems with the shortest queues
-        int minQLength = elements[0].getCurrentQueueLength();
+        int minQLength = elements[0].getQueue().size();
         ArrayList<Integer> indiciesOfElementsWithMinQLength = new ArrayList<>();
         indiciesOfElementsWithMinQLength.add(0);
 
         for (int i = 1; i < elements.length; i++) {
-            if (elements[i].getCurrentQueueLength() < minQLength) {
-                minQLength = elements[i].getCurrentQueueLength();
+            if (elements[i].getQueue().size() < minQLength) {
+                minQLength = elements[i].getQueue().size();
                 indiciesOfElementsWithMinQLength.clear();
                 indiciesOfElementsWithMinQLength.add(i);
-            } else if (elements[i].getCurrentQueueLength() == minQLength && i != 0) {
+            } else if (elements[i].getQueue().size() == minQLength && i != 0) {
                 indiciesOfElementsWithMinQLength.add(i);
             }
         }
@@ -54,7 +56,7 @@ public class PriorityBranching extends Element {
         }
 
         /// going that path
-        elements[bestIndex].onCustomerArrival();
+        elements[bestIndex].onCustomerArrival(customer);
     }
 
 }

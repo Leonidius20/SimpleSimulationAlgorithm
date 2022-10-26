@@ -1,5 +1,7 @@
 package ua.leonidius.queueing.elements;
 
+import ua.leonidius.queueing.Customer;
+
 import java.util.Arrays;
 import java.util.Random;
 
@@ -38,8 +40,8 @@ public class ProbabilisticBranching extends Element {
     }
 
     @Override
-    public void onCustomerArrival() {
-        super.onCustomerArrival(); // it's empty anyway
+    public void onCustomerArrival(Customer customer) {
+        super.onCustomerArrival(customer); // it's empty anyway
 
         Element nextElement = null;
 
@@ -56,6 +58,6 @@ public class ProbabilisticBranching extends Element {
 
 
         // going that path
-        nextElement.onCustomerArrival();
+        nextElement.onCustomerArrival(customer);
     }
 }

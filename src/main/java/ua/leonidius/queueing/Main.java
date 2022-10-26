@@ -14,12 +14,12 @@ public class Main {
         QueueingSystem queueingSystem1 = new QueueingSystem(2,
                 1, 3, ProbabilityDistribution.GAUSSIAN, "CASHIER 1");
         queueingSystem1.setServiceTimeStdDeviation(0.3);
-        queueingSystem1.setCurrentQueueLength(2);
+        // queueingSystem1.setCurrentQueueLength(2);
 
         QueueingSystem queueingSystem2 = new QueueingSystem(1,
                 1, 3, ProbabilityDistribution.GAUSSIAN, "CASHIER 2");
         queueingSystem2.setServiceTimeStdDeviation(0.3);
-        queueingSystem2.setCurrentQueueLength(2);
+        // queueingSystem2.setCurrentQueueLength(2);
 
         queueingSystem1.setTwinQSystem(queueingSystem2);
         queueingSystem2.setTwinQSystem(queueingSystem1);

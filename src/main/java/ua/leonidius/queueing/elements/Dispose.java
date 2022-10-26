@@ -1,6 +1,7 @@
 package ua.leonidius.queueing.elements;
 
 import lombok.Getter;
+import ua.leonidius.queueing.Customer;
 
 /**
  * The end element of the model, where customers are destroyed. Can be used to
@@ -12,7 +13,9 @@ public class Dispose extends Element {
      *  An accumulator of timestamps at which customers arrive to this element
      *  Used to calculate mean time clients spend in the system.
      */
-    @Getter private double customerArrivalTimesAccumulator;
+    // @Getter private double customerArrivalTimesAccumulator;
+
+    @Getter private double avgTimeInSystemAcc;
 
     /**
      * Accumulates times between customers leaving the system.
@@ -32,8 +35,9 @@ public class Dispose extends Element {
     }
 
     @Override
-    public void onCustomerArrival() {
-        customerArrivalTimesAccumulator += getCurrentTime();
+    public void onCustomerArrival(Customer customer) {
+        // customerArrivalTimesAccumulator += getCurrentTime();
+        avgTimeInSystemAcc += (getCurrentTime() - customer.creationTime());
 
         if (lastLeavingTimestamp != -1) { // if this is the first time a customer leaves the system
             timesBetweenLeavingAccumulator += (getCurrentTime() - lastLeavingTimestamp);
@@ -42,7 +46,7 @@ public class Dispose extends Element {
 
         // TODO: maybe actaully amke it a part of the event system
         // with end event happening right away
-        setNumberOfCustomersServed(getNumberOfCustomersServed() + 1);
+        numberOfCustomersServed++;
     }
 
 }

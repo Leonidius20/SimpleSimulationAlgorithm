@@ -2,6 +2,7 @@ package ua.leonidius.queueing.elements;
 
 import lombok.Getter;
 import lombok.Setter;
+import ua.leonidius.queueing.Customer;
 import ua.leonidius.queueing.utils.ProbabilityDistribution;
 import ua.leonidius.queueing.utils.ProbabilityDistributions;
 
@@ -13,7 +14,7 @@ public class Element {
     @Getter @Setter private double meanServiceTime;
     @Getter @Setter private double serviceTimeStdDeviation;
     @Getter @Setter private ProbabilityDistribution distribution;
-    @Getter @Setter private int numberOfCustomersServed;
+    @Getter @Setter protected int numberOfCustomersServed;
     @Getter @Setter private int state = 0;
 
     /**
@@ -92,7 +93,7 @@ public class Element {
         };
     }
 
-    public void onCustomerArrival() {
+    public void onCustomerArrival(Customer customer) {
 
     }
 

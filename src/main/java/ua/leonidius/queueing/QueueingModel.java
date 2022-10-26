@@ -1,6 +1,5 @@
 package ua.leonidius.queueing;
 
-import ua.leonidius.queueing.beans.output_params.OutputParameters;
 import ua.leonidius.queueing.elements.Create;
 import ua.leonidius.queueing.elements.Dispose;
 import ua.leonidius.queueing.elements.Element;
@@ -23,7 +22,7 @@ public class QueueingModel {
         listOfElements = elements;
     }
 
-    public OutputParameters simulate(double simulationTime) {
+    public void simulate(double simulationTime) {
         while (currentTime < simulationTime) {
 
             var nextEventElement =
@@ -59,27 +58,27 @@ public class QueueingModel {
             printIterationInfo();
         }
 
-        return getFinalResult();
+        getFinalResult();
     }
 
     public void printIterationInfo() {
         listOfElements.forEach(Element::printInfo);
     }
 
-    public OutputParameters getFinalResult() {
+    public void getFinalResult() {
         System.out.println("\n-------------RESULTS-------------");
 
 
         var createElement = (Create)listOfElements.stream()
                 .filter(e -> e instanceof Create).findFirst().get();
         int totalNumCustomersCreated = createElement.getNumberOfCustomersServed();
-        double customerArrivalTimesAcc = createElement.getCustomerEnterTimesAccumulator();
+        // double customerArrivalTimesAcc = createElement.getCustomerEnterTimesAccumulator();
 
         var disposeElement = (Dispose)listOfElements.stream()
                 .filter(e -> e instanceof Dispose).findFirst().get();
-        double disposeTimesAcc = disposeElement.getCustomerArrivalTimesAccumulator();
+        // double disposeTimesAcc = disposeElement.getCustomerArrivalTimesAccumulator();
 
-        double dropoutTimesAcc = 0;
+        // double dropoutTimesAcc = 0;
 
         List<Double> meanQLengths = new LinkedList<>();
         List<Double> meanUtilizations =  new LinkedList<>();
@@ -112,14 +111,14 @@ public class QueueingModel {
                     ((double)qSystem.getMeanNumberOfCustomersInSystemAccumulator() / currentTime);
             totalRefugees += qSystem.getNumberOfRefugees();
 
-            dropoutTimesAcc += qSystem.getDropoutTimestampsAccumulator();
+            // dropoutTimesAcc += qSystem.getDropoutTimestampsAccumulator();
         }
 
         double totalDropoutProbability = totalDropouts
                 / (double) (totalCustomersServed + totalDropouts);
 
-        double meanTimeInSystem = (disposeTimesAcc + dropoutTimesAcc - customerArrivalTimesAcc)
-                / totalNumCustomersCreated;
+        double meanTimeInSystem = disposeElement.getAvgTimeInSystemAcc()
+                / disposeElement.getNumberOfCustomersServed();
 
         double meanLeavingInterval = disposeElement.getTimesBetweenLeavingAccumulator()
                 / disposeElement.getNumberOfCustomersServed();
@@ -141,8 +140,6 @@ public class QueueingModel {
         }
 
         System.out.println(sb);
-
-        return null;
     }
 
 }
