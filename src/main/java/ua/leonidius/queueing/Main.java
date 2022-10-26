@@ -8,7 +8,9 @@ import java.util.ArrayList;
 public class Main {
 
     public static void main(String[] args) {
-        var creationElement = new Create(ProbabilityDistribution.EXPONENTIAL, new double[]{0.5});
+        var creationElement = new Create(
+                ProbabilityDistribution.EXPONENTIAL, new double[]{0.5},
+                new int[]{1}, new double[]{1.0});
         creationElement.setNextEventTime(0.1);
 
         QueueingSystem queueingSystem1 = new QueueingSystem(2,

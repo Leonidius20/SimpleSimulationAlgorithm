@@ -14,16 +14,9 @@ import java.util.LinkedList;
  */
 public class QueueingSystem extends Element {
 
-   // @Getter @Setter private int currentQueueLength;
     @Getter @Setter private int queueCapacity;
 
-    // @Getter private int numberOfProcessors = 1;
     private final Processor[] processors;
-
-    //@Getter private final int[] states;
-    //@Getter private final double[] nextEventTimes;
-
-    // private final Customer[] customersBeingProcessed;
 
     @Getter private final Deque<Customer> queue = new LinkedList<>();
 

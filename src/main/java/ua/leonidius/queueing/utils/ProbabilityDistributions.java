@@ -53,4 +53,15 @@ public class ProbabilityDistributions {
         return a;
     }
 
+    public static double randomErlang(double mean, int k) {
+        double result = 0;
+
+        double expoMean = mean / k; // expoMean = 1 / lambda, lambda = 1 / (mean / k)
+
+        for (int i = 0; i < k; i++) {
+            result += randomExponential(expoMean);
+        }
+        return result;
+    }
+
 }
