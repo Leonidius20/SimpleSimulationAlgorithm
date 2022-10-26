@@ -111,10 +111,11 @@ public class QueueingModel {
                     ((double)qSystem.getMeanNumberOfCustomersInSystemAccumulator() / currentTime);
             totalRefugees += qSystem.getNumberOfRefugees();
 
+            double avgTimeBetweenArrivals = qSystem.getTimesBetweenArrivalsAcc()
+                    / qSystem.getNumberOfCustomersServed();
+
             System.out.println("SYSTEM " + qSystem.getName());
-            System.out.println("Type 1 " + qSystem.getNumOfEachType()[0]);
-            System.out.println("Type 2 " + qSystem.getNumOfEachType()[1]);
-            System.out.println("Type 3 " + qSystem.getNumOfEachType()[2]);
+            System.out.println("Avg between arrivals " + avgTimeBetweenArrivals);
             System.out.println();
 
             // dropoutTimesAcc += qSystem.getDropoutTimestampsAccumulator();

@@ -4,7 +4,6 @@ import ua.leonidius.queueing.distributions.ExponentialDistribution;
 import ua.leonidius.queueing.distributions.NormalDistribution;
 import ua.leonidius.queueing.elements.*;
 import ua.leonidius.queueing.elements.branchings.TypeBranching;
-import ua.leonidius.queueing.elements.systems.InfiniteProcessorsQSystem;
 import ua.leonidius.queueing.elements.systems.QueueingSystem;
 
 import java.util.ArrayList;

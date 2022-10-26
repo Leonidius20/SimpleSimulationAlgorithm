@@ -20,6 +20,8 @@ public class InfiniteProcessorsQSystem extends QueueingSystem {
 
     @Override
     public void onCustomerArrival(Customer customer) {
+        updateArrivalsStats();
+
         var freeProcessorOptional = processors.stream()
                 .filter(Processor::isFree).findFirst();
 

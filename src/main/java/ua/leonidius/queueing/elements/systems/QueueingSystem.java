@@ -13,9 +13,6 @@ import java.util.*;
  */
 public class QueueingSystem extends Element {
 
-    // TODO remove
-    @Getter private final int[] numOfEachType = new int[3];
-
     protected final ArrayList<Processor> processors;
 
     @Getter @Setter private QSQueue queue;
@@ -56,6 +53,18 @@ public class QueueingSystem extends Element {
      */
     @Getter private int numberOfRefugees = 0;
 
+    /**
+     * Accumulates times between customers arriving to the queueing system.
+     * Needed to calculate the avg time between customer arrivals.
+     */
+    @Getter private double timesBetweenArrivalsAcc;
+
+    /**
+     * Timestamp of when the last customer arrived to the queueing system.
+     * Needed to calculate the avg time between customer arrivals.
+     */
+    private double lastArrivalTimestamp = -1;
+
     private final Map<Integer, Integer> transformationRules;
 
     public QueueingSystem(int numberOfProcessors, ProbabilityDistribution distribution,
@@ -81,7 +90,7 @@ public class QueueingSystem extends Element {
 
     @Override
     public void onCustomerArrival(Customer customer) {
-        numOfEachType[customer.type() - 1]++; // TODO remove
+        updateArrivalsStats();
 
         var freeProcessorOptional = processors.stream()
                 .filter(Processor::isFree).findFirst();
@@ -96,6 +105,13 @@ public class QueueingSystem extends Element {
             numberOfDropouts++;
             dropoutTimestampsAccumulator += getCurrentTime();
         }
+    }
+
+    protected void updateArrivalsStats() {
+        if (lastArrivalTimestamp != -1) { // if this is the first time a customer comes
+            timesBetweenArrivalsAcc += (getCurrentTime() - lastArrivalTimestamp);
+        }
+        lastArrivalTimestamp = getCurrentTime();
     }
 
     @Override
