@@ -12,11 +12,9 @@ import java.util.*;
  */
 public class QueueingSystem extends Element {
 
-    // @Getter @Setter private int queueCapacity;
+    protected final ArrayList<Processor> processors;
 
-    private final Processor[] processors;
-
-    @Getter @Setter private QSQueue queue; // TODO: create a builder
+    @Getter @Setter private QSQueue queue;
 
     /**
      * A queueing system where customers can move if the queue
@@ -60,9 +58,9 @@ public class QueueingSystem extends Element {
 
         this.queue = queue;
 
-        processors = new Processor[numberOfProcessors];
-        for (int i = 0; i < processors.length; i++) {
-            processors[i] = new Processor(this);
+        processors = new ArrayList<>(numberOfProcessors);
+        for (int i = 0; i < numberOfProcessors; i++) {
+            processors.add(new Processor(this));
         }
 
         this.nextEventProcessorIndex = 0;
@@ -70,7 +68,7 @@ public class QueueingSystem extends Element {
 
     @Override
     public void onCustomerArrival(Customer customer) {
-        var freeProcessorOptional = Arrays.stream(processors)
+        var freeProcessorOptional = processors.stream()
                 .filter(Processor::isFree).findFirst();
 
         if (freeProcessorOptional.isPresent()) {
@@ -78,7 +76,6 @@ public class QueueingSystem extends Element {
             freeProcessor.acceptCustomer(customer);
             updateNextEventProcessorIndex();
         } else if (!queue.isFull()) { // no free processors, but q isn't full
-            // currentQueueLength++;
             queue.enqueue(customer);
         } else {
             numberOfDropouts++;
@@ -90,18 +87,19 @@ public class QueueingSystem extends Element {
     public void onServiceCompletion() {
         super.onServiceCompletion();
 
-        if (processors[nextEventProcessorIndex].isFree()) {
+        var completedProcessor = processors.get(nextEventProcessorIndex);
+
+        if (completedProcessor.isFree()) {
             throw new RuntimeException("Processor designated as first to finish service is actually empty");
         }
 
         var processedCustomer
-                = processors[nextEventProcessorIndex].onServingComplete();
+                = completedProcessor.onServingComplete();
 
         // accepting a customer form q for service instead of the one that finished
         if (!queue.isEmpty()) {
-            // setCurrentQueueLength(getCurrentQueueLength() - 1);
             var customerFromQ = queue.takeFirst();
-            processors[nextEventProcessorIndex].acceptCustomer(customerFromQ);
+            completedProcessor.acceptCustomer(customerFromQ);
         }
 
         updateNextEventProcessorIndex();
@@ -127,12 +125,12 @@ public class QueueingSystem extends Element {
         }
     }
 
-    private void updateNextEventProcessorIndex() {
+    protected void updateNextEventProcessorIndex() {
         int nextProcessorIndex = 0;
-        double nextEventTime = processors[0].getNextEventTime();
+        double nextEventTime = processors.get(0).getNextEventTime();
 
-        for (int i = 1; i < processors.length; i++) {
-            double procINextEventTime = processors[i].getNextEventTime();
+        for (int i = 1; i < processors.size(); i++) {
+            double procINextEventTime = processors.get(i).getNextEventTime();
             if (procINextEventTime < nextEventTime) {
                 nextProcessorIndex = i;
                 nextEventTime = procINextEventTime;
@@ -144,7 +142,7 @@ public class QueueingSystem extends Element {
 
     @Override
     public void printInfo() {
-        System.out.println(getName() + " states= " + Arrays.stream(processors).mapToInt(Processor::getState).toString() +
+        System.out.println(getName() + " states= " + Arrays.toString(processors.stream().mapToInt(Processor::getState).toArray()) +
                 " quantity served = " + getNumberOfCustomersServed() +
                 " tnext= " + getNextEventTime() + " queue length " + queue.size());
         System.out.println("failure = " + this.getNumberOfDropouts());
@@ -155,10 +153,10 @@ public class QueueingSystem extends Element {
         meanQueueLengthAccumulator += queue.size() * delta;
 
         var numCustomersBeingProcessed
-                = Arrays.stream(processors).mapToInt(Processor::getState).sum();
+                = processors.stream().mapToInt(Processor::getState).sum();
 
         meanUtilizationAccumulator +=
-                + (numCustomersBeingProcessed / (double)processors.length) * delta;
+                + (numCustomersBeingProcessed / (double)processors.size()) * delta;
 
         meanNumberOfCustomersInSystemAccumulator +=
                 (queue.size() + numCustomersBeingProcessed) * delta;
@@ -167,7 +165,7 @@ public class QueueingSystem extends Element {
 
     @Override
     public double getNextEventTime() {
-        return processors[nextEventProcessorIndex].getNextEventTime();
+        return processors.get(nextEventProcessorIndex).getNextEventTime();
     }
 
     /**
@@ -340,8 +338,37 @@ public class QueueingSystem extends Element {
 
     }
 
-    static class Builder {
+    public static class NoQueue implements QSQueue {
 
+        @Override
+        public boolean isFull() {
+            return true;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return true;
+        }
+
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        @Override
+        public void enqueue(Customer customer) {
+            throw new RuntimeException("Tried to place a customer into a no-queue");
+        }
+
+        @Override
+        public Customer takeFirst() {
+            throw new RuntimeException("Tried to take a customer out of a no-queue");
+        }
+
+        @Override
+        public Customer stealLast() {
+            throw new RuntimeException("Tried to take a customer out of a no-queue");
+        }
     }
 
 }

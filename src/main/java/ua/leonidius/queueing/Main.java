@@ -9,13 +9,12 @@ import java.util.ArrayList;
 public class Main {
 
     public static void main(String[] args) {
-        var creationElement = new Create(new ExponentialDistribution(15),
+        var creationElement = new Create(new ExponentialDistribution(0.5),
                 new int[]{1, 2, 3}, new double[]{0.5, 0.1, 0.4});
 
 
-        QueueingSystem queueingSystem1 = new QueueingSystem(2,
-                new NormalDistribution(1, 0.3),
-                new QueueingSystem.LimitedQueue(3), "CASHIER 1");
+        QueueingSystem queueingSystem1 = new InfiniteProcessorsQSystem(
+                new NormalDistribution(1, 0.3), "CASHIER 1");
 
         // queueingSystem1.setCurrentQueueLength(2);
 
