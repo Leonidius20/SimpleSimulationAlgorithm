@@ -52,8 +52,15 @@ public class QueueingSystem extends Element {
      */
     @Getter private int numberOfRefugees = 0;
 
+    private final Map<Integer, Integer> transformationRules;
+
     public QueueingSystem(int numberOfProcessors, ProbabilityDistribution distribution,
                           QSQueue queue, String name) {
+        this(numberOfProcessors, distribution, queue, name, null);
+    }
+
+    public QueueingSystem(int numberOfProcessors, ProbabilityDistribution distribution,
+                          QSQueue queue, String name, Map<Integer, Integer> transformationRules) {
         super(distribution, name);
 
         this.queue = queue;
@@ -64,6 +71,8 @@ public class QueueingSystem extends Element {
         }
 
         this.nextEventProcessorIndex = 0;
+
+        this.transformationRules = transformationRules;
     }
 
     @Override
@@ -121,6 +130,14 @@ public class QueueingSystem extends Element {
         }
 
         if (getNextElement() != null) {
+            if (transformationRules != null) {
+                var type = processedCustomer.type();
+                if (transformationRules.containsKey(type)) {
+                    processedCustomer = new Customer(
+                            transformationRules.get(type), processedCustomer.creationTime());
+                }
+            }
+
             getNextElement().onCustomerArrival(processedCustomer);
         }
     }

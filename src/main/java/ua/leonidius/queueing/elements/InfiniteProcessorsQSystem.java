@@ -3,13 +3,15 @@ package ua.leonidius.queueing.elements;
 import ua.leonidius.queueing.Customer;
 import ua.leonidius.queueing.distributions.ProbabilityDistribution;
 
+import java.util.Map;
+
 /**
  * A queueing system that adds more processors as needed. It doesn't have a queue
  */
 public class InfiniteProcessorsQSystem extends QueueingSystem {
 
-    public InfiniteProcessorsQSystem(ProbabilityDistribution distribution, String name) {
-        super(1, distribution, new NoQueue(), name);
+    public InfiniteProcessorsQSystem(ProbabilityDistribution distribution, String name, Map<Integer, Integer> transformationRules) {
+        super(1, distribution, new NoQueue(), name, transformationRules);
     }
 
     @Override

@@ -5,6 +5,8 @@ import ua.leonidius.queueing.distributions.NormalDistribution;
 import ua.leonidius.queueing.elements.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Main {
 
@@ -12,15 +14,17 @@ public class Main {
         var creationElement = new Create(new ExponentialDistribution(0.5),
                 new int[]{1, 2, 3}, new double[]{0.5, 0.1, 0.4});
 
+        var qs1Transformations = new HashMap<Integer, Integer>();
+        qs1Transformations.put(3, 1);
 
         QueueingSystem queueingSystem1 = new InfiniteProcessorsQSystem(
-                new NormalDistribution(1, 0.3), "CASHIER 1");
+                new NormalDistribution(1, 0.3), "CASHIER 1", qs1Transformations);
 
         // queueingSystem1.setCurrentQueueLength(2);
 
         QueueingSystem queueingSystem2 = new QueueingSystem(2,
                 new NormalDistribution(1, 0.3),
-                new QueueingSystem.LimitedQueue(3), "CASHIER 2");
+                new QueueingSystem.LimitedQueue(3), "CASHIER 2", qs1Transformations);
         // queueingSystem2.setCurrentQueueLength(2);
 
         queueingSystem1.setTwinQSystem(queueingSystem2);
