@@ -88,6 +88,37 @@ public class QueueingSystem extends Element {
         this.transformationRules = transformationRules;
     }
 
+    public QueueingSystem(int numberOfProcessors, Map<Integer, ProbabilityDistribution> distributionsMap,
+                          QSQueue queue, String name) {
+        this(numberOfProcessors, distributionsMap, queue, name, null);
+    }
+
+    /**
+     *
+     * @param numberOfProcessors
+     * @param distributionsMap mapping from types of customers to distributions of their servicing times
+     * @param queue
+     * @param name
+     * @param transformationRules if you want this system to change types of customers after processing,
+     *                            it maps from former type to new type. All possible types should be there
+     *                            even if you want some of them to stay the same.
+     */
+    public QueueingSystem(int numberOfProcessors, Map<Integer, ProbabilityDistribution> distributionsMap,
+                          QSQueue queue, String name, Map<Integer, Integer> transformationRules) {
+        super(distributionsMap, name);
+
+        this.queue = queue;
+
+        processors = new ArrayList<>(numberOfProcessors);
+        for (int i = 0; i < numberOfProcessors; i++) {
+            processors.add(new Processor(this));
+        }
+
+        this.nextEventProcessorIndex = 0;
+
+        this.transformationRules = transformationRules;
+    }
+
     @Override
     public void onCustomerArrival(Customer customer) {
         updateArrivalsStats();
@@ -250,7 +281,8 @@ public class QueueingSystem extends Element {
                 throw new RuntimeException("Called acceptCustomer() on a busy processor");
 
             state = 1;
-            nextEventTime = parentQSystem.getCurrentTime() + parentQSystem.getServiceTime();
+            nextEventTime = parentQSystem.getCurrentTime()
+                    + parentQSystem.getServiceTime(customer);
             customerBeingServed = customer;
         }
 
@@ -340,7 +372,7 @@ public class QueueingSystem extends Element {
 
         private final PriorityQueue<Customer> q;
 
-        InfinitePriorityQueue(Map<Integer, Integer> typeToPriorityMap) {
+        public InfinitePriorityQueue(Map<Integer, Integer> typeToPriorityMap) {
             q = new PriorityQueue<>(
                     Comparator.comparingInt(customer -> typeToPriorityMap.get(customer.type())));
         }

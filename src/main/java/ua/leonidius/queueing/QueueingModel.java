@@ -147,10 +147,6 @@ public class QueueingModel {
         }
 
         System.out.println(sb);
-
-        System.out.println("Sinked of Type 1 " + disposeElement.getNumOfEachType()[0]);
-        System.out.println("Sinked of Type 2 " + disposeElement.getNumOfEachType()[1]);
-        System.out.println("Sinked of Type 3 " + disposeElement.getNumOfEachType()[2]);
     }
 
 }

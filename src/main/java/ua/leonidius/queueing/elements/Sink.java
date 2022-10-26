@@ -3,8 +3,6 @@ package ua.leonidius.queueing.elements;
 import lombok.Getter;
 import ua.leonidius.queueing.Customer;
 
-import java.util.Arrays;
-
 /**
  * The end element of the model, where customers are destroyed. Can be used to
  * gather statistics at the end of the model.
@@ -31,13 +29,9 @@ public class Sink extends Element {
      */
     private double lastLeavingTimestamp = -1;
 
-    //TODO; remove
-    @Getter private final int[] numOfEachType = new int[3];
-
     public Sink() {
         this.generatesEvents = false;
         setNextEventTime(Double.MAX_VALUE); // no events, although it's not added to model anyway
-        Arrays.fill(numOfEachType, 0);
     }
 
     @Override
@@ -53,9 +47,6 @@ public class Sink extends Element {
         // TODO: maybe actaully amke it a part of the event system
         // with end event happening right away
         numberOfCustomersServed++;
-
-        // todo: remove
-        numOfEachType[customer.type() - 1]++;
     }
 
 }

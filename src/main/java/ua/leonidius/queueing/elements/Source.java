@@ -39,7 +39,7 @@ public class Source extends Element {
     @Override
     public void onServiceCompletion() {
         super.onServiceCompletion();
-        super.setNextEventTime(super.getCurrentTime() + super.getServiceTime());
+        super.setNextEventTime(super.getCurrentTime() + super.getServiceTime(null));
         customerEnterTimesAccumulator += getCurrentTime();
 
         // selecting next customer type

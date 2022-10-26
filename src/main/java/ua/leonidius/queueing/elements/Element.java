@@ -7,6 +7,8 @@ import ua.leonidius.queueing.distributions.ConstantValue;
 import ua.leonidius.queueing.distributions.ExponentialDistribution;
 import ua.leonidius.queueing.distributions.ProbabilityDistribution;
 
+import java.util.Map;
+
 public class Element {
 
     @Getter @Setter private String name;
@@ -14,6 +16,16 @@ public class Element {
     @Setter private double nextEventTime = 0.0;
 
     @Getter @Setter private ProbabilityDistribution distribution;
+
+    /**
+     * Whether service time has the same distribution for all types of customers
+     */
+    @Getter final boolean singleDistributionForAllTypes;
+
+    /**
+     * Maps customer types to distributions of service time for each of them
+     */
+    private final Map<Integer, ProbabilityDistribution> customerTypeToDistMap;
 
     @Getter @Setter protected int numberOfCustomersServed;
     @Getter @Setter private int state = 0;
@@ -33,6 +45,8 @@ public class Element {
     @Getter protected boolean generatesEvents = true;
 
     public Element() {
+        singleDistributionForAllTypes = true;
+        customerTypeToDistMap = null;
         distribution = new ExponentialDistribution(1.0);
 
         id = nextId;
@@ -41,9 +55,9 @@ public class Element {
     }
 
     public Element(double constantServiceTime) {
-        name = "anonymous";
 
-        // this.meanServiceTime = meanServiceTime;
+        singleDistributionForAllTypes = true;
+        customerTypeToDistMap = null;
         distribution = new ConstantValue(constantServiceTime);
 
         id = nextId;
@@ -52,8 +66,9 @@ public class Element {
     }
 
     public Element(ProbabilityDistribution distribution) {
-        name = "anonymous";
 
+        singleDistributionForAllTypes = true;
+        customerTypeToDistMap = null;
         this.distribution = distribution;
 
         id = nextId;
@@ -62,17 +77,35 @@ public class Element {
     }
 
     public Element(ProbabilityDistribution distribution, String nameOfElement) {
-        name = nameOfElement;
 
+        singleDistributionForAllTypes = true;
+        customerTypeToDistMap = null;
         this.distribution = distribution;
 
         id = nextId;
         nextId++;
-        name = "element" + id;
+        name = nameOfElement + "(ID " + id + ")";
     }
 
-    public double getServiceTime() {
-        return distribution.next();
+    public Element(Map<Integer, ProbabilityDistribution> customerTypeToDistMap, String name) {
+        singleDistributionForAllTypes = false;
+        this.customerTypeToDistMap = customerTypeToDistMap;
+        this.distribution = null;
+
+        id = nextId;
+        nextId++;
+        this.name = name + "(ID " + id + ")";
+    }
+
+    public double getServiceTime(Customer customer) {
+        if (isSingleDistributionForAllTypes())
+            return distribution.next();
+        else {
+            if (!customerTypeToDistMap.containsKey(customer.type()))
+                throw new RuntimeException("Distributions map doesn't have a record for this type of element");
+
+            return customerTypeToDistMap.get(customer.type()).next();
+        }
     }
 
     public void onCustomerArrival(Customer customer) {
