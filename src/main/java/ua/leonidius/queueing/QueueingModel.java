@@ -130,21 +130,9 @@ public class QueueingModel {
         double meanLeavingInterval = disposeElement.getTimesBetweenLeavingAccumulator()
                 / disposeElement.getNumberOfCustomersServed();
 
-        System.out.println("totalNumCustomersGenerated, meanNumberOfClientsInSystem, meanLeavingInterval, meanTimeInSystem, totalDropoutProbability, totalRefugees, meanQLength1, meanQLength2, meanUtilization1, meanUtilization2\n"/*, numDropouts3, meanQLength3, meanUtilization3\n"*/);
+        System.out.println("mean time in system");
         var sb = new StringBuilder();
-        sb.append(totalNumCustomersCreated).append(',');
-        sb.append(meanNumOfCustomersInModel).append(',');
-        sb.append(meanLeavingInterval).append(',');
         sb.append(meanTimeInSystem).append(',');
-        sb.append(totalDropoutProbability).append(',');
-        sb.append(totalRefugees).append(',');
-
-        for (var meanQLength : meanQLengths) {
-            sb.append(meanQLength).append(',');
-        }
-        for (var utilization : meanUtilizations) {
-            sb.append(utilization).append(',');
-        }
 
         System.out.println(sb);
     }
