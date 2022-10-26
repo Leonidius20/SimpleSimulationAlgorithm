@@ -1,26 +1,27 @@
 package ua.leonidius.queueing;
 
+import ua.leonidius.queueing.distributions.ExponentialDistribution;
+import ua.leonidius.queueing.distributions.NormalDistribution;
 import ua.leonidius.queueing.elements.*;
-import ua.leonidius.queueing.utils.ProbabilityDistribution;
 
 import java.util.ArrayList;
 
 public class Main {
 
     public static void main(String[] args) {
-        var creationElement = new Create(
-                ProbabilityDistribution.EXPONENTIAL, new double[]{0.5},
-                new int[]{1}, new double[]{1.0});
-        creationElement.setNextEventTime(0.1);
+        var creationElement = new Create(new ExponentialDistribution(15),
+                new int[]{1, 2, 3}, new double[]{0.5, 0.1, 0.4});
+
 
         QueueingSystem queueingSystem1 = new QueueingSystem(2,
-                1, 3, ProbabilityDistribution.GAUSSIAN, "CASHIER 1");
-        queueingSystem1.setServiceTimeStdDeviation(0.3);
+                new NormalDistribution(1, 0.3),
+                new QueueingSystem.LimitedQueue(3), "CASHIER 1");
+
         // queueingSystem1.setCurrentQueueLength(2);
 
-        QueueingSystem queueingSystem2 = new QueueingSystem(1,
-                1, 3, ProbabilityDistribution.GAUSSIAN, "CASHIER 2");
-        queueingSystem2.setServiceTimeStdDeviation(0.3);
+        QueueingSystem queueingSystem2 = new QueueingSystem(2,
+                new NormalDistribution(1, 0.3),
+                new QueueingSystem.LimitedQueue(3), "CASHIER 2");
         // queueingSystem2.setCurrentQueueLength(2);
 
         queueingSystem1.setTwinQSystem(queueingSystem2);

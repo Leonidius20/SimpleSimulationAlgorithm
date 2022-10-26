@@ -140,6 +140,10 @@ public class QueueingModel {
         }
 
         System.out.println(sb);
+
+        System.out.println("Type 1 " + disposeElement.getNumOfEachType()[0]);
+        System.out.println("Type 2 " + disposeElement.getNumOfEachType()[1]);
+        System.out.println("Type 3 " + disposeElement.getNumOfEachType()[2]);
     }
 
 }

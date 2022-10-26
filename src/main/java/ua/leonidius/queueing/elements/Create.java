@@ -2,7 +2,7 @@ package ua.leonidius.queueing.elements;
 
 import lombok.Getter;
 import ua.leonidius.queueing.Customer;
-import ua.leonidius.queueing.utils.ProbabilityDistribution;
+import ua.leonidius.queueing.distributions.ProbabilityDistribution;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -21,9 +21,9 @@ public class Create extends Element {
 
     private final Random randomG = new Random();
 
-    public Create(ProbabilityDistribution distribution, double[] distParams,
+    public Create(ProbabilityDistribution distribution,
                   int[] customerTypes, double[] probabilities) {
-        super(distribution, distParams);
+        super(distribution);
 
         if (customerTypes.length < 1)
             throw new RuntimeException("There should be at least 1 customer type provided");

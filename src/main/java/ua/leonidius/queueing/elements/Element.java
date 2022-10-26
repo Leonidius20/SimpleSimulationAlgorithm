@@ -3,17 +3,18 @@ package ua.leonidius.queueing.elements;
 import lombok.Getter;
 import lombok.Setter;
 import ua.leonidius.queueing.Customer;
-import ua.leonidius.queueing.utils.ProbabilityDistribution;
-import ua.leonidius.queueing.utils.ProbabilityDistributions;
+import ua.leonidius.queueing.distributions.ConstantValue;
+import ua.leonidius.queueing.distributions.ExponentialDistribution;
+import ua.leonidius.queueing.distributions.ProbabilityDistribution;
 
 public class Element {
 
     @Getter @Setter private String name;
     @Getter @Setter private double currentTime = 0.0;
     @Setter private double nextEventTime = 0.0;
-    @Getter @Setter private double meanServiceTime;
-    @Getter @Setter private double serviceTimeStdDeviation;
+
     @Getter @Setter private ProbabilityDistribution distribution;
+
     @Getter @Setter protected int numberOfCustomersServed;
     @Getter @Setter private int state = 0;
 
@@ -32,36 +33,26 @@ public class Element {
     @Getter protected boolean generatesEvents = true;
 
     public Element() {
-        meanServiceTime = 1.0;
-
-        distribution = ProbabilityDistribution.EXPONENTIAL;
+        distribution = new ExponentialDistribution(1.0);
 
         id = nextId;
         nextId++;
         name = "element" + id;
     }
 
-    public Element(double meanServiceTime) {
+    public Element(double constantServiceTime) {
         name = "anonymous";
 
-        this.meanServiceTime = meanServiceTime;
-        distribution = ProbabilityDistribution.NONE;
+        // this.meanServiceTime = meanServiceTime;
+        distribution = new ConstantValue(constantServiceTime);
 
         id = nextId;
         nextId++;
         name = "element" + id;
     }
 
-    public Element(ProbabilityDistribution distribution, double[] distParams) {
+    public Element(ProbabilityDistribution distribution) {
         name = "anonymous";
-
-        if (distribution == ProbabilityDistribution.EXPONENTIAL
-                || distribution == ProbabilityDistribution.NONE) {
-            this.meanServiceTime = distParams[0];
-        } else {
-            this.meanServiceTime = distParams[0];
-            this.serviceTimeStdDeviation = distParams[1];
-        }
 
         this.distribution = distribution;
 
@@ -70,12 +61,10 @@ public class Element {
         name = "element" + id;
     }
 
-    public Element(String nameOfElement, double meanServiceTime) {
+    public Element(ProbabilityDistribution distribution, String nameOfElement) {
         name = nameOfElement;
 
-        this.meanServiceTime = meanServiceTime;
-
-        distribution = ProbabilityDistribution.EXPONENTIAL;
+        this.distribution = distribution;
 
         id = nextId;
         nextId++;
@@ -83,14 +72,7 @@ public class Element {
     }
 
     public double getServiceTime() {
-        return switch (distribution) {
-            case UNIFORM ->  ProbabilityDistributions.randomUniform(meanServiceTime,
-                    serviceTimeStdDeviation);
-            case GAUSSIAN -> ProbabilityDistributions.randomNormal(meanServiceTime,
-                    serviceTimeStdDeviation);
-            case EXPONENTIAL -> ProbabilityDistributions.randomExponential(meanServiceTime);
-            default -> meanServiceTime;
-        };
+        return distribution.next();
     }
 
     public void onCustomerArrival(Customer customer) {

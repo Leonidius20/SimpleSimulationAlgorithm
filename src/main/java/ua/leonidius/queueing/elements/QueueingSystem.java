@@ -3,22 +3,20 @@ package ua.leonidius.queueing.elements;
 import lombok.Getter;
 import lombok.Setter;
 import ua.leonidius.queueing.Customer;
-import ua.leonidius.queueing.utils.ProbabilityDistribution;
+import ua.leonidius.queueing.distributions.ProbabilityDistribution;
 
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * A Queueing system element (Система масового обслуговування)
  */
 public class QueueingSystem extends Element {
 
-    @Getter @Setter private int queueCapacity;
+    // @Getter @Setter private int queueCapacity;
 
     private final Processor[] processors;
 
-    @Getter private final Deque<Customer> queue = new LinkedList<>();
+    @Getter @Setter private QSQueue queue; // TODO: create a builder
 
     /**
      * A queueing system where customers can move if the queue
@@ -32,9 +30,9 @@ public class QueueingSystem extends Element {
      */
     private int nextEventProcessorIndex;
 
-    @Getter private int numberOfDropouts;
-    @Getter private double meanQueueLengthAccumulator;
-    @Getter private double meanUtilizationAccumulator;
+    @Getter private int numberOfDropouts = 0;
+    @Getter private double meanQueueLengthAccumulator = 0.0;
+    @Getter private double meanUtilizationAccumulator = 0.0;
 
     /**
      * Accumulates the values for the mean number of customers in the system
@@ -56,35 +54,11 @@ public class QueueingSystem extends Element {
      */
     @Getter private int numberOfRefugees = 0;
 
-    public QueueingSystem(double delay) {
-        super(delay);
-        // currentQueueLength = 0;
-        queueCapacity = Integer.MAX_VALUE;
-        meanQueueLengthAccumulator = 0.0;
+    public QueueingSystem(int numberOfProcessors, ProbabilityDistribution distribution,
+                          QSQueue queue, String name) {
+        super(distribution, name);
 
-        processors = new Processor[1];
-        processors[0] = new Processor(this);
-
-        this.nextEventProcessorIndex = 0;
-    }
-
-    public QueueingSystem(double delay, int queueCapacity,
-                          ProbabilityDistribution distribution, String name) {
-        super(name, delay);
-        setQueueCapacity(queueCapacity);
-        setDistribution(distribution);
-
-        processors = new Processor[1];
-        processors[0] = new Processor(this);
-
-        this.nextEventProcessorIndex = 0;
-    }
-
-    public QueueingSystem(int numberOfProcessors, double delay, int queueCapacity,
-                          ProbabilityDistribution distribution, String name) {
-        super(name, delay);
-        setQueueCapacity(queueCapacity);
-        setDistribution(distribution);
+        this.queue = queue;
 
         processors = new Processor[numberOfProcessors];
         for (int i = 0; i < processors.length; i++) {
@@ -103,9 +77,9 @@ public class QueueingSystem extends Element {
             var freeProcessor = freeProcessorOptional.get();
             freeProcessor.acceptCustomer(customer);
             updateNextEventProcessorIndex();
-        } else if (queue.size() < getQueueCapacity()) { // no free processors, but q isn't full
+        } else if (!queue.isFull()) { // no free processors, but q isn't full
             // currentQueueLength++;
-            queue.addLast(customer);
+            queue.enqueue(customer);
         } else {
             numberOfDropouts++;
             dropoutTimestampsAccumulator += getCurrentTime();
@@ -126,7 +100,7 @@ public class QueueingSystem extends Element {
         // accepting a customer form q for service instead of the one that finished
         if (!queue.isEmpty()) {
             // setCurrentQueueLength(getCurrentQueueLength() - 1);
-            var customerFromQ = queue.pollFirst();
+            var customerFromQ = queue.takeFirst();
             processors[nextEventProcessorIndex].acceptCustomer(customerFromQ);
         }
 
@@ -136,11 +110,11 @@ public class QueueingSystem extends Element {
         if (twinQSystem != null) {
             // if the twin's system q is at least 2 customers longer than our q
             // and we have a free place is our q
-            if (queue.size() < queueCapacity
+            if ((!queue.isFull())
                     && (twinQSystem.queue.size() - this.queue.size()) >= 2) {
                 // stealing a guy from their q
                 // twinQSystem.setCurrentQueueLength(twinQSystem.getCurrentQueueLength() - 1);
-                var stolenCustomer = twinQSystem.queue.pollLast();
+                var stolenCustomer = twinQSystem.queue.stealLast();
 
                 onCustomerArrival(stolenCustomer);
 
@@ -242,6 +216,131 @@ public class QueueingSystem extends Element {
             nextEventTime = parentQSystem.getCurrentTime() + parentQSystem.getServiceTime();
             customerBeingServed = customer;
         }
+
+    }
+
+    /**
+     * Represents the queue in front of processors in this QueueingSystem
+     */
+    static interface QSQueue {
+
+        boolean isFull();
+
+        boolean isEmpty();
+
+        int size();
+
+        void enqueue(Customer customer);
+
+        Customer takeFirst();
+
+        Customer stealLast();
+
+    }
+
+    public static class LimitedQueue implements QSQueue {
+
+        private final Deque<Customer> q = new LinkedList<>();
+        @Getter private final int capacity;
+
+        public LimitedQueue(int capacity) {
+            this.capacity = capacity;
+        }
+
+        @Override
+        public boolean isFull() {
+            return q.size() >= capacity;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return q.isEmpty();
+        }
+
+        @Override
+        public int size() {
+            return q.size();
+        }
+
+        @Override
+        public void enqueue(Customer customer) {
+            if (isFull())
+                throw new RuntimeException("Tried to add element to a full limited queue");
+
+            q.addLast(customer);
+        }
+
+        @Override
+        public Customer takeFirst() {
+            return q.pollFirst();
+        }
+
+        @Override
+        public Customer stealLast() {
+            return q.pollLast();
+        }
+
+    }
+
+    public static class InfiniteQueue extends LimitedQueue {
+
+        public InfiniteQueue() {
+            super(-1);
+        }
+
+        @Override
+        public boolean isFull() {
+            return false;
+        }
+
+    }
+
+    /**
+     * Represents a queue before QueueingSystem's processors that has
+     * an infinite capacity and gives priority to certain customer types
+     */
+    public static class InfinitePriorityQueue implements QSQueue {
+
+        private final PriorityQueue<Customer> q;
+
+        InfinitePriorityQueue(Map<Integer, Integer> typeToPriorityMap) {
+            q = new PriorityQueue<>(
+                    Comparator.comparingInt(customer -> typeToPriorityMap.get(customer.type())));
+        }
+
+        @Override
+        public boolean isFull() {
+            return false;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return q.isEmpty();
+        }
+
+        @Override
+        public int size() {
+            return q.size();
+        }
+
+        @Override
+        public void enqueue(Customer customer) {
+            q.add(customer);
+        }
+
+        @Override
+        public Customer takeFirst() {
+            return q.poll();
+        }
+
+        @Override
+        public Customer stealLast() {
+            return q.poll(); // can't really take last element
+        }
+
+    }
+
+    static class Builder {
 
     }
 
