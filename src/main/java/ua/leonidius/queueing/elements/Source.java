@@ -36,6 +36,10 @@ public class Source extends Element {
         this.probabilities = probabilities;
     }
 
+    public Source(ProbabilityDistribution distribution) {
+        this(distribution, new int[]{1}, new double[]{1.0});
+    }
+
     @Override
     public void onServiceCompletion() {
         super.onServiceCompletion();

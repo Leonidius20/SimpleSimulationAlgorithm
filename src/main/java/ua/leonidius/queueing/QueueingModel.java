@@ -22,7 +22,13 @@ public class QueueingModel {
         listOfElements = elements;
     }
 
-    public void simulate(double simulationTime) {
+    /**
+     * Number of events that have happened in the system during simulation.
+     * Is used for statistics
+     */
+    private int numberOfEvents = 0;
+
+    public int simulate(double simulationTime) {
         while (currentTime < simulationTime) {
 
             var nextEventElement =
@@ -33,9 +39,9 @@ public class QueueingModel {
             nextEventTime = nextEventElement.getNextEventTime();
             nextEventId = nextEventElement.getId();
 
-            System.out.println("\nIt's time for event in " +
-                    nextEventElement.getName() +
-                    ", id="+ nextEventId + ", time=" + nextEventTime);
+            //System.out.println("\nIt's time for event in " +
+            //        nextEventElement.getName() +
+            //        ", id="+ nextEventId + ", time=" + nextEventTime);
 
 
             double delta = nextEventTime - currentTime;
@@ -48,25 +54,27 @@ public class QueueingModel {
             });
 
             nextEventElement.onServiceCompletion(); // it depends on updated currentTime
+            numberOfEvents++;
 
             for (Element e : listOfElements) {
                 if (e.isGeneratesEvents() && e.getNextEventTime() == currentTime) {
                     e.onServiceCompletion();
+                    numberOfEvents++;
                 }
             }
 
-            printIterationInfo();
+            // printIterationInfo();
         }
 
-        getFinalResult();
+        return getFinalResult();
     }
 
     public void printIterationInfo() {
         listOfElements.forEach(Element::printInfo);
     }
 
-    public void getFinalResult() {
-        System.out.println("\n-------------RESULTS-------------");
+    public int getFinalResult() {
+        /*System.out.println("\n-------------RESULTS-------------");
 
 
         var createElement = (Source)listOfElements.stream()
@@ -134,7 +142,9 @@ public class QueueingModel {
         var sb = new StringBuilder();
         sb.append(meanTimeInSystem).append(',');
 
-        System.out.println(sb);
+        System.out.println(sb);*/
+
+        return numberOfEvents;
     }
 
 }
