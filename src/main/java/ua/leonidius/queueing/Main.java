@@ -58,13 +58,24 @@ public class Main {
 
         QueueingModel model = new QueueingModel(list);
 
-        var beforeTimestamp = System.currentTimeMillis();
-        model.simulate(10000.0);
-        var afterTimestamp = System.currentTimeMillis();
+        long lengthAcc = 0;
+        double atomTimeEstAcc = 0;
 
-        long lengthInMillis = afterTimestamp - beforeTimestamp;
+        for (int i = 0; i < 10; i++) {
+            var beforeTimestamp = System.currentTimeMillis();
+            int numOfEvents = model.simulate(100000.0);
+            System.out.println("events " + numOfEvents);
 
-        System.out.println("TIME: " + lengthInMillis + "ms");
+            var afterTimestamp = System.currentTimeMillis();
+
+            long lengthInMillis = afterTimestamp - beforeTimestamp;
+            lengthAcc += lengthInMillis;
+            double atomTimeEst = lengthInMillis / (numOfEvents * 7.0);
+            atomTimeEstAcc += atomTimeEst;
+        }
+
+        System.out.println("TIME: " + lengthAcc / 10 + "ms");
+        System.out.println("Elementaer time est " + atomTimeEstAcc / 10);
     }
 
 }
