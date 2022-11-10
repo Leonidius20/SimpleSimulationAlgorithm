@@ -4,6 +4,7 @@ import ua.leonidius.queueing.distributions.*;
 import ua.leonidius.queueing.elements.Element;
 import ua.leonidius.queueing.elements.Sink;
 import ua.leonidius.queueing.elements.Source;
+import ua.leonidius.queueing.elements.branchings.ProbabilisticBranching;
 import ua.leonidius.queueing.elements.systems.QueueingSystem;
 
 import java.util.ArrayList;
@@ -11,56 +12,59 @@ import java.util.ArrayList;
 public class Main {
 
     public static void main(String[] args) {
-        int NUM_OF_ELEMENTARY_OPERATIONS = 7;
+        var list = new ArrayList<Element>();
 
-        // 96
-        double elementaryTimeEstAcc = 0;
+        var source = new Source(new ExponentialDistribution(2));
+        list.add(source);
 
-        System.out.println("numOfSystems,estimatedTime,realTime");
+        // K1
+        var k1 = new QueueingSystem(1,
+                new ExponentialDistribution(0.6),
+                new QueueingSystem.InfiniteQueue(), "K1");
+        source.setNextElement(k1);
+        list.add(k1);
 
-        for (int numberOfSystems = 100; numberOfSystems <= 800; numberOfSystems += 100) {
+        // Sink
+        var sink = new Sink();
+        list.add(sink);
 
-            ArrayList<Element> list = new ArrayList<>();
+        // K2
+        var k2 = new QueueingSystem(1,
+                new ExponentialDistribution(0.3),
+                new QueueingSystem.InfiniteQueue(), "K2");
+        k2.setNextElement(k1);
+        list.add(k2);
 
-            // SOURCE
-            var source = new Source(new ExponentialDistribution(0.6));
-            list.add(source);
+        // K3
+        var k3 = new QueueingSystem(1,
+                new ExponentialDistribution(0.4),
+                new QueueingSystem.InfiniteQueue(), "K3");
+        k3.setNextElement(k1);
+        list.add(k3);
 
-            Element prevElement = source;
-            for (int i = 0; i < numberOfSystems; i++) {
-                var qSystem = new QueueingSystem(1,
-                        new ExponentialDistribution(0.4),
-                        new QueueingSystem.InfiniteQueue(),
-                        "Q System" + (i + 1));
-                prevElement.setNextElement(qSystem);
-                list.add(qSystem);
-                prevElement = qSystem;
-            }
+        // K4
+        var k4 = new QueueingSystem(2,
+                new ExponentialDistribution(0.1),
+                new QueueingSystem.InfiniteQueue(), "K4");
+        k4.setNextElement(k1);
+        list.add(k4);
 
-            // SINK
-            var sink = new Sink();
-            prevElement.setNextElement(sink);
-            list.add(sink);
+        // branching
+        var branching = new ProbabilisticBranching(
+                new Element[]{sink, k4, k2, k3},
+                new double[]{0.42, 0.3, 0.15, 0.13}
+        );
+        k1.setNextElement(branching);
 
-            QueueingModel model = new QueueingModel(list);
+        QueueingModel model = new QueueingModel(list);
 
-            var beforeTimestamp = System.currentTimeMillis();
-            model.simulate(10000.0);
-            var afterTimestamp = System.currentTimeMillis();
+        var beforeTimestamp = System.currentTimeMillis();
+        model.simulate(10000.0);
+        var afterTimestamp = System.currentTimeMillis();
 
-            long lengthInMillis = afterTimestamp - beforeTimestamp;
+        long lengthInMillis = afterTimestamp - beforeTimestamp;
 
-            double predictedTime
-                    = numberOfSystems * NUM_OF_ELEMENTARY_OPERATIONS;
-
-            elementaryTimeEstAcc +=
-                    (lengthInMillis / (double)(NUM_OF_ELEMENTARY_OPERATIONS * numberOfSystems));
-
-            System.out.println(numberOfSystems + "," + predictedTime + "," + lengthInMillis);
-        }
-
-        elementaryTimeEstAcc /= 8.0;
-        System.out.println("Elementary time " + elementaryTimeEstAcc);
+        System.out.println("TIME: " + lengthInMillis + "ms");
     }
 
 }
