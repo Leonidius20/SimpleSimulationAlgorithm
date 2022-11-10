@@ -13,9 +13,12 @@ public class Main {
     public static void main(String[] args) {
         int NUM_OF_ELEMENTARY_OPERATIONS = 7;
 
+        // 96
+        double elementaryTimeEstAcc = 0;
+
         System.out.println("numOfSystems,estimatedTime,realTime");
 
-        for (int numberOfSystems = 100; numberOfSystems <= 1000; numberOfSystems += 100) {
+        for (int numberOfSystems = 100; numberOfSystems <= 800; numberOfSystems += 100) {
 
             ArrayList<Element> list = new ArrayList<>();
 
@@ -50,8 +53,14 @@ public class Main {
             double predictedTime
                     = numberOfSystems * NUM_OF_ELEMENTARY_OPERATIONS;
 
+            elementaryTimeEstAcc +=
+                    (lengthInMillis / (double)(NUM_OF_ELEMENTARY_OPERATIONS * numberOfSystems));
+
             System.out.println(numberOfSystems + "," + predictedTime + "," + lengthInMillis);
         }
+
+        elementaryTimeEstAcc /= 8.0;
+        System.out.println("Elementary time " + elementaryTimeEstAcc);
     }
 
 }
